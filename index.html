@@ -27,13 +27,14 @@
                 <input type="text" placeholder="var/num" class="mini-input">
                 </div>
             <div class="category-title">Переменные</div>
-            <div class="block-template variable-decl" draggable="true" data-type="assignment">
+
+            <div class="block-template variable-dec1" draggable="true" data-type="assignment">
                 <span>Int</span> 
                 <input type="text" placeholder="name" class="mini-input"> 
                 <span>=</span>
                 <input type="number" placeholder="value" class="mini-input" value="0">
             </div>
-            
+
             <div class="block-template variable-dec2" draggable="true" data-type="assignment">
                 <span>Int</span>
                 <input type="text" placeholder="name" class="mini-input">
@@ -44,8 +45,11 @@
             </div>
 
             <div class="category-title">Арифметика</div>
+            <div class="block-template variable-val" draggable="true" data-type="assignment">
+                <input type="text" placeholder="name" class="mini-input">
+            </div>
+
             <div class="block-template math-op" draggable="true" data-type="math">
-                <input type="text" placeholder="A" class="mini-input">
                 <select class="mini-select">
                     <option>+</option>
                     <option>-</option>
@@ -53,7 +57,13 @@
                     <option>/</option>
                     <option>%</option>
                 </select>
-                <input type="text" placeholder="B" class="mini-input">
+            </div>
+            
+            <div class="block-template brackets" draggable="true" data-type="math">
+                <select class="mini-select">
+                    <option>(</option>
+                    <option>)</option>
+                </select>
             </div>
 
             <div class="category-title">Логика</div>

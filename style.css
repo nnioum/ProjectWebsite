@@ -108,7 +108,7 @@ body {
     cursor: grabbing;
 }
 
-.variable-decl { 
+.variable-dec1 { 
     background-color: #e67e22; 
 }
 
@@ -116,9 +116,21 @@ body {
     background-color: #e7b43c; 
 }
 
+.variable-val{
+    background-color: #d2ca2f;
+    width: 50px;
+}
+
 .math-op { 
     background-color: #3498db; 
+    width: 50px;
 }
+
+.brackets{
+    background-color: #5b23bc;
+    width: 50px;
+}
+
 .if-block { 
     background-color: #9b59b6;
     flex-direction: column;
