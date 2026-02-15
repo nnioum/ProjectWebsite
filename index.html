@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeBlock: Интерпретатор (Уровень Основа)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="top-bar">
+        <div class="logo">CodeBlock</div>
+        <div class="actions">
+            <button id="clear-btn" class="btn secondary">Очистить</button>
+            <button id="run-btn" class="btn primary">▶ Запустить</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <aside class="sidebar">
+            <h3>Инструменты</h3>
+            <div class="category-title">Вывод</div>
+            <div class="block-template print-block" draggable="true" data-type="print">
+                <span>Print</span> 
+                <input type="text" placeholder="var/num" class="mini-input">
+                </div>
+            <div class="category-title">Переменные</div>
+            <div class="block-template variable-decl" draggable="true" data-type="declaration">
+                <span>Int</span> 
+                <input type="text" placeholder="name" class="mini-input"> 
+                <span>= 0</span>
+            </div>
+            
+            <div class="block-template variable-set" draggable="true" data-type="assignment">
+                <span>Set</span>
+                <input type="text" placeholder="name" class="mini-input">
+                <span>=</span>
+                <input type="text" placeholder="value" class="mini-input">
+            </div>
+
+            <div class="category-title">Арифметика</div>
+            <div class="block-template math-op" draggable="true" data-type="math">
+                <input type="text" placeholder="A" class="mini-input">
+                <select class="mini-select">
+                    <option>+</option>
+                    <option>-</option>
+                    <option>*</option>
+                    <option>/</option>
+                    <option>%</option>
+                </select>
+                <input type="text" placeholder="B" class="mini-input">
+            </div>
+
+            <div class="category-title">Логика</div>
+            <div class="block-template if-block" draggable="true" data-type="if">
+                <div class="block-header">
+                    <span>IF</span>
+                    <input type="text" placeholder="A" class="mini-input">
+                    <select class="mini-select">
+                        <option>></option>
+                        <option><</option>
+                        <option>==</option>
+                        <option>!=</option>
+                    </select>
+                    <input type="text" placeholder="B" class="mini-input">
+                </div>
+                <div class="block-body">
+                    <div class="placeholder">Перетащи сюда</div>
+                </div>
+            </div>
+            
+
+        </aside>
+
+        <main class="workspace" id="workspace">
+            <div class="start-message">Перетащите блоки сюда, чтобы начать...</div>
+            </main>
+
+        <aside class="console-panel">
+            <h3>Вывод</h3>
+            <div id="console-output" class="output-box">
+                <span class="system-msg">Ожидание запуска...</span>
+            </div>
+        </aside>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
