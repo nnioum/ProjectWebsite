@@ -13,6 +13,7 @@
         <div class="actions">
             <button id="clear-btn" class="btn secondary">Очистить</button>
             <button id="run-btn" class="btn primary">▶ Запустить</button>
+            <button id="stop-btn" class="btn danger" disabled>■ Остановить</button>
         </div>
     </header>
 
@@ -26,17 +27,20 @@
                 <input type="text" placeholder="var/num" class="mini-input">
                 </div>
             <div class="category-title">Переменные</div>
-            <div class="block-template variable-decl" draggable="true" data-type="declaration">
+            <div class="block-template variable-decl" draggable="true" data-type="assignment">
                 <span>Int</span> 
                 <input type="text" placeholder="name" class="mini-input"> 
-                <span>= 0</span>
+                <span>=</span>
+                <input type="number" placeholder="value" class="mini-input" value="0">
             </div>
             
-            <div class="block-template variable-set" draggable="true" data-type="assignment">
-                <span>Set</span>
+            <div class="block-template variable-dec2" draggable="true" data-type="assignment">
+                <span>Int</span>
                 <input type="text" placeholder="name" class="mini-input">
                 <span>=</span>
-                <input type="text" placeholder="value" class="mini-input">
+                <div class="block-body">
+                    <div class="placeholder">Перетащи сюда</div>
+                </div>
             </div>
 
             <div class="category-title">Арифметика</div>
@@ -60,6 +64,8 @@
                     <select class="mini-select">
                         <option>></option>
                         <option><</option>
+                        <option>>=</option>
+                        <option><=</option>
                         <option>==</option>
                         <option>!=</option>
                     </select>

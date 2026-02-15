@@ -43,13 +43,22 @@ body {
     font-weight: bold;
 }
 
+.danger { 
+    background-color: #c0392b; 
+    color: white; 
+}
+
+.danger:hover { 
+    background-color: #a93226; 
+}
+
 .primary { 
-    background-color: #4caf50; 
+    background-color: #408540; 
     color: white; 
 }
 .primary:hover {
     background-color:
-    #45a049; }
+    #314432; }
 
 .secondary { 
     background-color: #555; 
@@ -99,13 +108,14 @@ body {
     cursor: grabbing;
 }
 
-
 .variable-decl { 
     background-color: #e67e22; 
 }
-.variable-set { 
-    background-color: #d35400; 
+
+.variable-dec2 { 
+    background-color: #e7b43c; 
 }
+
 .math-op { 
     background-color: #3498db; 
 }
