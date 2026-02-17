@@ -14,6 +14,7 @@ document.querySelectorAll('.sidebar .block-template').forEach(block => {
     });
 });
 
+
 workspace.addEventListener('dragover', event => {
    event.preventDefault();
 });
@@ -32,10 +33,11 @@ workspace.addEventListener('drop', event =>{
         newBlock.classList.add('block-template');
 
         if(type === 'print') newBlock.classList.add('print-block');
-        if(type === 'declaration') newBlock.classList.add('variable-dec1');
-        if(type === 'assignment') newBlock.classList.add('variable-dec2');
+        if(type === 'declaration') newBlock.classList.add('variable-decl');
+        if(type === 'assignment') newBlock.classList.add('variable-assig');
         if(type === 'math') newBlock.classList.add('math-op');
         if(type === 'assignment-val') newBlock.classList.add('variable-val');
+        if(type === 'assignment-num') newBlock.classList.add('variable-num');
         if(type === 'math-brackets') newBlock.classList.add('brackets');
         if(type === 'if') newBlock.classList.add('if-block');
         
@@ -112,35 +114,40 @@ runBtn.addEventListener('click', () => {
 function executeBlock(block) {
     const type = block.dataset.type;
 
-    // --- ОБЪЯВЛЕНИЕ ПЕРЕМЕННОЙ (Int name = 0) ---
+    // присваивание int переменной 
     if (type === 'declaration') {
-        const nameInput = block.querySelector('input');
+        const inputs = block.querySelectorAll('input');
+        
+        const nameInput = inputs[0];
         const varName = nameInput.value.trim();
+
+        let varValue = Number(inputs[1].value.trim()); 
 
         if (!varName) throw new Error("Ошибка: Имя переменной не может быть пустым");
         if (variables.hasOwnProperty(varName)) throw new Error(`Ошибка: Переменная '${varName}' уже существует`);
 
-        variables[varName] = 0; // По умолчанию 0
-        printLog(`Объявлена переменная: ${varName} = 0`);
+        variables[varName] = varValue;
+        printLog(`Объявлена переменная: ${varName} = ${varValue}`);
     }
 
-    // --- ПРИСВАИВАНИЕ (Set name = value) ---
+    //Присваивания int с блоком
     else if (type === 'assignment') {
         const inputs = block.querySelectorAll('input');
         const varName = inputs[0].value.trim();
-        
-        // Проверяем, существует ли переменная
-        if (!variables.hasOwnProperty(varName)) throw new Error(`Ошибка: Переменная '${varName}' не найдена`);
 
-        // Пытаемся найти второй input (если ты исправил HTML)
-        let val;
-        if (inputs.length > 1) {
-             val = getValue(inputs[1].value);
-        } else {
-             // Если HTML старый (со span), используем prompt
-             const inputVal = prompt(`Введите значение для ${varName}:`);
-             val = parseInt(inputVal);
+        if (!varName) throw new Error("Ошибка: Имя переменной не может быть пустым");
+
+        if (!variables.hasOwnProperty(varName)){
+            variables[varName] = null;
+        };
+
+        if (!inputs[1] || inputs[1].value.trim() === '') {
+            throw new Error("Ошибка: Не указано значение для присваивания");
         }
+
+        const expression = inputs[1].value.trim();
+
+        let val = buildExpressionFromBlocks(expression);//Нужно написать функцию, которая будет разбирать строку expression и вычислять результат, учитывая переменные и операции
 
         variables[varName] = val;
         printLog(`Присвоено: ${varName} = ${variables[varName]}`);
@@ -156,27 +163,6 @@ function executeBlock(block) {
         printSuccess(`OUTPUT: ${content}`);
     }
 
-    // --- АРИФМЕТИКА (A + B) ---
-    else if (type === 'math') {
-        const inputs = block.querySelectorAll('input');
-        const select = block.querySelector('select');
-        
-        const valA = getValue(inputs[0].value);
-        const valB = getValue(inputs[1].value);
-        const op = select.value;
-        
-        let res = 0;
-        if (op === '+') res = valA + valB;
-        if (op === '-') res = valA - valB;
-        if (op === '*') res = valA * valB;
-        if (op === '/') {
-            if (valB === 0) throw new Error("Ошибка: Деление на ноль!");
-            res = Math.floor(valA / valB);
-        }
-        if (op === '%') res = valA % valB;
-
-        printLog(`Результат: ${valA} ${op} ${valB} = ${res}`);
-    }
 
     // --- УСЛОВИЕ (IF) ---
     else if (type === 'if') {
@@ -244,6 +230,8 @@ function printSuccess(msg) {
     line.style.color = '#4caf50';
     consoleOutput.appendChild(line);
 }
+
+
 
 // Кнопка очистки workspace
 clearBtn.addEventListener('click', () => {

@@ -9,6 +9,7 @@ body {
     color: #d4d4d4;
     overflow: hidden;
 }
+
 /*Текст вверху*/
 .top-bar {
     height: 10px;
@@ -108,16 +109,21 @@ body {
     cursor: grabbing;
 }
 
-.variable-dec1 { 
+.variable-decl { 
     background-color: #e67e22; 
 }
 
-.variable-dec2 { 
+.variable-assig { 
     background-color: #e7b43c; 
 }
 
 .variable-val{
     background-color: #d2ca2f;
+    width: 50px;
+}
+
+.variable-num{
+    background-color: #9ef10f;
     width: 50px;
 }
 
