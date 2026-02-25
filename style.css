@@ -118,7 +118,6 @@ body {
 
 .variable-val{
     background-color: #d2ca2f;
-    width: 50px;
 }
 
 .math-op { 
@@ -155,6 +154,13 @@ body {
 
 .mini-input {
     width: 40px;
+    border: none;
+    border-radius: 2px;
+    padding: 2px 4px;
+    font-family: monospace;
+}
+
+.long-input {
     border: none;
     border-radius: 2px;
     padding: 2px 4px;
