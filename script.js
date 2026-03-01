@@ -49,7 +49,7 @@ workspace.addEventListener('drop', event =>{
         const dropTarget = event.target.closest('.block-body') || workspace;
 
         if(event.target.closest('.block-header')){
-            event.target.closest('.if-block').querySelector('.block-body').appendChild(newBlock);
+            event.target.closest('.if-block').querySelector('.variable-dec2, .if-block').appendChild(newBlock);
         }else{
             dropTarget.appendChild(newBlock);
         }
@@ -58,6 +58,12 @@ workspace.addEventListener('drop', event =>{
             const body = newBlock.querySelector('.block-body');
             body.innerHTML = '';
         }
+
+        if (type === "assignment"){
+            const body = newBlock.querySelector('.block-body');
+            body.innerHTML = '';
+        }
+
     }
 
 });
