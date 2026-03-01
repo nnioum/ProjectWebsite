@@ -6,7 +6,6 @@
     <title>CodeBlock: Интерпретатор (Уровень Основа)</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
     <header class="top-bar">
@@ -29,14 +28,14 @@
                 </div>
             <div class="category-title">Переменные</div>
 
-            <div class="block-template variable-decl" draggable="true" data-type="declaration">
+            <div class="block-template variable-dec1" draggable="true" data-type="declaration">
                 <span>Int</span> 
                 <input type="text" placeholder="name" class="mini-input"> 
                 <span>=</span>
                 <input type="number" placeholder="value" class="mini-input" value="0">
             </div>
 
-            <div class="block-template variable-assig" draggable="true" data-type="assignment">
+            <div class="block-template variable-dec2" draggable="true" data-type="assignment">
                 <span>Int</span>
                 <input type="text" placeholder="name" class="mini-input">
                 <span>=</span>
@@ -47,57 +46,18 @@
 
             <div class="category-title">Арифметика</div>
             <div class="block-template variable-val" draggable="true" data-type="assignment-val">
-                <input type="text" placeholder="name" class="mini-input">
-            </div>
-
-            <div class="block-template variable-num" draggable="true" data-type="assignment-num">
-                <input type="number" placeholder="number" class="mini-input">
-            </div>
-
-            <div class="block-template math-op" draggable="true" data-type="math">
-                <select class="mini-select">
-                    <option>+</option>
-                    <option>-</option>
-                    <option>*</option>
-                    <option>/</option>
-                    <option>%</option>
-                </select>
-            </div>
-            
-            <div class="block-template brackets" draggable="true" data-type="math-brackets">
-                <select class="mini-select">
-                    <option>(</option>
-                    <option>)</option>
-                </select>
+                <input type="text" placeholder="arithmetic expression" class = "long-input">
             </div>
 
             <div class="category-title">Логика</div>
             <div class="block-template if-block" draggable="true" data-type="if">
                 <div class="block-header">
                     <span>IF</span>
-                    <input type="text" placeholder="A" class="mini-input">
-                    <select class="mini-select">
-                        <option>></option>
-                        <option><</option>
-                        <option>>=</option>
-                        <option><=</option>
-                        <option>==</option>
-                        <option>!=</option>
-                    </select>
-                    <input type="text" placeholder="B" class="mini-input">
+                    <input type="text" placeholder="logical expression" class="long-input">
                 </div>
                 <div class="block-body">
                     <div class="placeholder">Перетащи сюда</div>
                 </div>
-            </div>
-
-            <div class="category-title">Логические опрераторы</div>
-            <div class="block-tamplate logic-val" draggable="true" data-type="math">
-                <select class="mini-select">
-                    <option>AND</option>
-                    <option>OR</option>
-                    <option>NOT</option>
-                </select>
             </div>
             
 

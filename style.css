@@ -8,7 +8,7 @@ body {
     flex-direction: column;
     background-color: #1e1e1e;
     color: #d4d4d4;
-    overflow: hidden;
+    overflow: hidden; 
 }
 
 /*Текст вверху*/
@@ -51,7 +51,7 @@ body {
 }
 
 .danger:hover { 
-    background-color: #a93226; 
+    background-color: #68150d; 
 }
 
 .primary { 
@@ -104,27 +104,34 @@ body {
     gap: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     border: 1px solid rgba(255,255,255,0.1);
+    min-width: 200px;
+    max-width: 400px;    
+    display: block; 
+    
+
 }
 
 .block-template:active {
     cursor: grabbing;
+    min-width: 200px;
+    max-width: 400px;  
+    display: block;   
 }
 
 .variable-decl { 
     background-color: #e67e22; 
+    min-width: 200px;
+    max-width: 400px;  
+    display: block;   
+    
 }
 
-.variable-assig { 
+.variable-dec2 { 
     background-color: #e7b43c; 
 }
 
 .variable-val{
     background-color: #d2ca2f;
-    width: 50px;
-}
-
-.variable-num{
-    background-color: #9ef10f;
     width: 50px;
 }
 
@@ -140,19 +147,15 @@ body {
 
 .if-block { 
     background-color: #9b59b6;
-    flex-direction: column;
-    align-items: stretch;
-    padding: 0;
+    min-width: 200px;
+    max-width: 400px;    
+    display: block; 
 }
-.logic-val{ 
-    color: white; 
-    height: 35px;
-    background-color: #5b23bc;
-    width: 70px;
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+
+.if-block .block-body{
+    width: 80%; 
+    display: flex;            
+    flex-direction: column
 }
 
 .block-header {
@@ -172,6 +175,14 @@ body {
 
 .mini-input {
     width: 40px;
+    border: none;
+    border-radius: 2px;
+    padding: 2px 4px;
+    font-family: monospace;
+}
+
+.long-input {
+    width: 120px;
     border: none;
     border-radius: 2px;
     padding: 2px 4px;
