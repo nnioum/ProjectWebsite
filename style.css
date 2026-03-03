@@ -232,7 +232,16 @@ body {
     justify-content: center;
     box-sizing: border-box;  
 }
-
+.while-block{
+    border-radius: 4px;             
+    margin: 10px 0;                  
+    background: #87c7c4;                
+    display: flex;                    
+    flex-direction: column;  
+    align-items: flex-start; 
+    padding: 0px;  
+    user-select: none; 
+}
 /* 3. КОНСОЛЬ */
 .console-panel {
     width: 250px;

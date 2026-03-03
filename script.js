@@ -38,6 +38,7 @@ workspace.addEventListener('drop', event =>{
         if (type === 'assignment-val') newBlock.classList.add('variable-val');
         if(type === 'if') newBlock.classList.add('if-block');
         if(type === 'if-else') newBlock.classList.add('if-else-block');
+        if(type === 'while') newBlock.classList.add('while-block');
         
         newBlock.dataset.type = type;
         newBlock.innerHTML = html;
