@@ -86,11 +86,18 @@ workspace.addEventListener('drop', event =>{
     event.preventDefault();
     if (!draggedBlock) return;
     
-    const dropTarget = event.target.closest('.block-template');
-    if (dropTarget && dropTarget !=draggedBlock){
-        workspace.insertBefore(draggedBlock, dropTarget);
-    }else{
-        workspace.appendChild(draggedBlock);
+     const innerBody = event.target.closest('.block-body');
+
+    if (innerBody && !innerBody.contains(draggedBlock)) {
+        innerBody.appendChild(draggedBlock);
+    } else {
+        const dropTarget = event.target.closest('.block-template');
+
+        if (dropTarget && dropTarget !== draggedBlock) {
+            workspace.insertBefore(draggedBlock, dropTarget);
+        } else {
+            workspace.appendChild(draggedBlock);
+        }
     }
     draggedBlock = null;
 });
