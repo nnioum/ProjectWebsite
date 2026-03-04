@@ -152,12 +152,6 @@ body {
     display: block; 
 }
 
-.if-block .block-body{
-    width: 80%; 
-    display: flex;            
-    flex-direction: column
-}
-
 .block-header {
     padding: 8px;
     display: flex;
@@ -165,6 +159,9 @@ body {
     gap: 5px;
 }
 .block-body {
+    width: 80%; 
+    display: flex;            
+    flex-direction: column;
     background-color: rgba(0,0,0,0.2);
     min-height: 30px;
     margin: 0 5px 5px 15px;
@@ -201,8 +198,10 @@ body {
     position: relative;
     overflow: auto;
 }
+
 .print-block { background-color: #16a085; 
 }
+
 .start-message {
     color: #555;
     text-align: center;
