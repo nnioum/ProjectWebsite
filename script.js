@@ -33,7 +33,7 @@ workspace.addEventListener('drop', event =>{
         newBlock.classList.add('block-template');
 
         if(type === 'print') newBlock.classList.add('print-block');
-        if(type === 'assignment') newBlock.classList.add('variable-dec2');
+        if(type === 'assignment') newBlock.classList.add('variable-dec');
         if (type === 'assignment-val') newBlock.classList.add('variable-val');
         if(type === 'if') newBlock.classList.add('if-block');
         if(type === 'if-else') newBlock.classList.add('if-else-block');
@@ -46,7 +46,7 @@ workspace.addEventListener('drop', event =>{
         const dropTarget = event.target.closest('.block-body') || workspace;
 
         if(event.target.closest('.block-header')){
-            event.target.closest('.if-block').querySelector('.variable-dec2, .if-block').appendChild(newBlock);
+            event.target.closest('.if-block').querySelector('.variable-dec, .if-block').appendChild(newBlock);
         }else{
             dropTarget.appendChild(newBlock);
         }

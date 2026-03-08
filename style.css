@@ -111,11 +111,11 @@ body {
 }
 
 
-.variable-dec2 { 
+.variable-dec { 
     background-color: #e7b43c; 
 }
 
-.variable-dec2 .long-input{
+.variable-dec .long-input{
     width: 80px;
     border: none;
     border-radius: 2px;
