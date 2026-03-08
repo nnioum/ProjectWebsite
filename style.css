@@ -1,4 +1,3 @@
-
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
@@ -34,7 +33,6 @@ body {
     vertical-align: middle;
 }
 
-/* кнопки */
 .btn {
     padding: 8px 16px;
     border: none;
@@ -57,12 +55,13 @@ body {
     color: white; 
 }
 .primary:hover {
-    background-color:
-    #314432; }
+    background-color: #314432; 
+}
 
 .secondary { 
     background-color: #555; 
-    color: white; margin-right: 10px; 
+    color: white; 
+    margin-right: 10px; 
 }
 .secondary:hover { 
     background-color: #666; 
@@ -97,75 +96,83 @@ body {
     cursor: grab;
     color: white;
     font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    display: block;
+    min-width: 200px;
+    max-width: 400px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     border: 1px solid rgba(255,255,255,0.1);
-    min-width: 200px;
-    max-width: 400px;    
-    display: block; 
-    
-
+    position: relative;
 }
 
 .block-template:active {
     cursor: grabbing;
-    min-width: 200px;
-    max-width: 400px;  
-    display: block;   
+    opacity: 0.9;
 }
 
-.variable-dec1 {
-    background-color: #e67e22; 
-    min-width: 200px;
-    max-width: 400px;  
-    display: block;   
-    
-}
 
-.variable-dec2 { 
+.variable-dec { 
     background-color: #e7b43c; 
 }
 
-.variable-val{
+.variable-dec .long-input{
+    width: 80px;
+    border: none;
+    border-radius: 2px;
+    padding: 2px 4px;
+    font-family: monospace;
+}
+
+.variable-val {
     background-color: #d2ca2f;
-    width: 50px;
 }
 
-.math-op { 
-    background-color: #3498db; 
-    width: 50px;
-}
-
-.brackets{
-    background-color: #5b23bc;
-    width: 50px;
-}
-
-.if-block { 
+.if-block,
+.if-else-block { 
     background-color: #9b59b6;
-    min-width: 200px;
-    max-width: 400px;    
-    display: block; 
+}
+
+.while-block {
+    background-color: #87c7c4;
+}
+
+.function-block{
+    background-color: rgb(26, 72, 141);
+}
+
+.call-block{
+    background-color: #3498db;
+}
+
+.return-block{
+    background-color: #bb5145;
+}
+
+.print-block { 
+    background-color: #16a085; 
 }
 
 .block-header {
-    padding: 8px;
     display: flex;
     align-items: center;
     gap: 5px;
+    padding: 0;
+    margin-bottom: 8px;
 }
+
 .block-body {
-    width: 80%; 
-    display: flex;            
-    flex-direction: column;
+    width: calc(100% - 20px);
+    display: block;
     background-color: rgba(0,0,0,0.2);
     min-height: 30px;
-    margin: 0 5px 5px 15px;
+    margin: 5px 0 5px 10px;
     border-radius: 4px;
     padding: 5px;
     border: 1px dashed rgba(255,255,255,0.3);
+}
+
+.else-selection {
+    width: 100%;
+    margin-top: 10px;
 }
 
 .mini-input {
@@ -183,6 +190,7 @@ body {
     padding: 2px 4px;
     font-family: monospace;
 }
+
 .mini-select {
     border-radius: 2px;
     border: none;
@@ -197,41 +205,12 @@ body {
     overflow: auto;
 }
 
-.print-block { background-color: #16a085; 
-}
-
 .start-message {
     color: #555;
     text-align: center;
     margin-top: 100px;
     font-size: 1.2rem;
 }
-.if-else-block {    
-    border-radius: 4px;             
-    margin: 10px 0;                  
-    background: #9b59b6;                
-    display: flex;                    
-    flex-direction: column;  
-    align-items: flex-start; 
-    padding: 0px;  
-    user-select: none;        
-}
-
-.else-selection{
-    width: 100%;
-}
-
-.while-block{
-    border-radius: 4px;             
-    margin: 10px 0;                  
-    background: #87c7c4;                
-    display: flex;                    
-    flex-direction: column;  
-    align-items: flex-start; 
-    padding: 0px;  
-    user-select: none; 
-}
-
 
 .console-panel {
     width: 250px;
@@ -257,6 +236,33 @@ body {
 .system-msg {
     color: #888; 
 }
+
 .error-msg {
     color: #ff4444;
+}
+
+.block-close-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    border: none;
+    background: rgba(0, 0, 0, 0.2);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    z-index: 10;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+.block-close-btn:hover {
+    background: rgba(255, 68, 68, 0.8);
+    transform: scale(1.1);
 }

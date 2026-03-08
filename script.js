@@ -5,9 +5,10 @@ const clearBtn = document.getElementById('clear-btn');
 const stopBtn = document.getElementById('stop-btn');
 
 let variables = {};
+let functions = {};
 
 document.querySelectorAll('.sidebar .block-template').forEach(block => {
-    block.addEventListener('dragstart', event =>{
+    block.addEventListener('dragstart', event => {
         event.dataTransfer.setData('type', event.target.dataset.type);
         event.dataTransfer.setData('html', event.target.innerHTML);
         event.dataTransfer.setData('source', 'sidebar');
@@ -15,84 +16,78 @@ document.querySelectorAll('.sidebar .block-template').forEach(block => {
 });
 
 workspace.addEventListener('dragover', event => {
-   event.preventDefault();
+    event.preventDefault();
 });
 
-workspace.addEventListener('drop', event =>{
+workspace.addEventListener('drop', event => {
     event.preventDefault();
 
     const type = event.dataTransfer.getData('type');
     const html = event.dataTransfer.getData('html');
     const source = event.dataTransfer.getData('source');
 
-    if(source === 'sidebar'){
+    if (source === 'sidebar') {
         const startMessage = workspace.querySelector('.start-message');
         if (startMessage) startMessage.remove();
 
-        const newBlock=document.createElement('div');
+        const newBlock = document.createElement('div');
         newBlock.classList.add('block-template');
 
-        if(type === 'print') newBlock.classList.add('print-block');
-        if(type === 'declaration') newBlock.classList.add('variable-dec1');
-        if(type === 'assignment') newBlock.classList.add('variable-dec2');
-        if (type === 'assignment-val') newBlock.classList.add('variable-val');
-        if(type === 'if') newBlock.classList.add('if-block');
-        if(type === 'if-else') newBlock.classList.add('if-else-block');
-        if(type === 'while') newBlock.classList.add('while-block');
-        
+        if (type === 'print') newBlock.classList.add('print-block');
+        if (type === 'assignment') newBlock.classList.add('variable-dec');
+        if (type === 'if') newBlock.classList.add('if-block');
+        if (type === 'if-else') newBlock.classList.add('if-else-block');
+        if (type === 'while') newBlock.classList.add('while-block');
+        if (type === 'functions') newBlock.classList.add('function-block');
+        if (type === 'call') newBlock.classList.add('call-block');
+        if (type === 'return') newBlock.classList.add('return-block');
+
         newBlock.dataset.type = type;
         newBlock.innerHTML = html;
         newBlock.setAttribute('draggable', 'true');
 
-        newBlock.addEventListener('dblclick', event =>{
-            newBlock.remove();
-        });
-
         const dropTarget = event.target.closest('.block-body') || workspace;
+        dropTarget.appendChild(newBlock);
 
-        if(event.target.closest('.block-header')){
-            event.target.closest('.if-block').querySelector('.variable-dec2, .if-block').appendChild(newBlock);
-        }else{
-            dropTarget.appendChild(newBlock);
-        }
-        
-        if (type === 'if'){
-            const body = newBlock.querySelector('.block-body');
-            body.innerHTML = '';
+        const closeBtn = newBlock.querySelector('.block-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(event) {
+                event.stopPropagation();
+                this.closest('.block-template').remove();
+            });
         }
 
-        if (type === "assignment"){
-            const body = newBlock.querySelector('.block-body');
-            body.innerHTML = '';
+        if (type === 'if' || type === 'if-else' || type === 'while' || type === 'functions') {
+            const bodies = newBlock.querySelectorAll('.block-body');
+            bodies.forEach(body => {
+                body.innerHTML = '';
+            });
         }
-
     }
-
 });
 
 let draggedBlock = null;
 
-workspace.addEventListener('dragstart', event =>{
-    if(event.target.classList.contains('block-template')){
+workspace.addEventListener('dragstart', event => {
+    if (event.target.classList.contains('block-template')) {
         draggedBlock = event.target;
     }
 });
 
-workspace.addEventListener('dragover', event =>{
+workspace.addEventListener('dragover', event => {
     event.preventDefault();
 });
 
-workspace.addEventListener('drop', event =>{
+workspace.addEventListener('drop', event => {
     event.preventDefault();
     if (!draggedBlock) return;
-    
-     const innerBody = event.target.closest('.block-body');
+
+    const innerBody = event.target.closest('.block-body');
 
     if (innerBody && !innerBody.contains(draggedBlock)) {
         innerBody.appendChild(draggedBlock);
     } else {
         const dropTarget = event.target.closest('.block-template');
-
         if (dropTarget && dropTarget !== draggedBlock) {
             workspace.insertBefore(draggedBlock, dropTarget);
         } else {
@@ -102,7 +97,6 @@ workspace.addEventListener('drop', event =>{
     draggedBlock = null;
 });
 
-
 runBtn.addEventListener('click', () => {
     consoleOutput.innerHTML = '';
     variables = {};
@@ -110,8 +104,10 @@ runBtn.addEventListener('click', () => {
 });
 
 clearBtn.addEventListener('click', () => {
-    workspace.innerHTML = '<div class="start-message">Перетащите блоки сюда...</div>';
+    workspace.innerHTML = '<div class="start-message">Перетащите блоки сюда, чтобы начать...</div>';
     consoleOutput.innerHTML = '';
+    variables = {};
+    functions = {};
 });
 
 function executeBlocks(container) {
@@ -123,12 +119,25 @@ function executeBlocks(container) {
         const type = block.dataset.type;
 
         if (type === 'print') handlePrint(block);
-        if (type === 'declaration') handleDeclaration(block);
         if (type === 'assignment') handleAssignment(block);
         if (type === 'if') handleIf(block);
         if (type === 'if-else') handleIfElse(block);
         if (type === 'while') handleWhile(block);
+        if (type === 'functions') handleFunctionDefinition(block);
+        if (type === 'call') {
+            const result = handleFunctionCall(block);
+            if (result !== null && result !== undefined) {
+                return result;
+            }
+        }
+        if (type === 'return') {
+            const returnValue = handleReturn(block);
+            if (returnValue !== null) {
+                return returnValue;
+            }
+        }
     }
+    return null;
 }
 
 function handlePrint(block) {
@@ -137,7 +146,7 @@ function handlePrint(block) {
         print(input.slice(1, -1));
         return;
     }
-     
+
     if (!isNaN(input)) {
         print(input);
         return;
@@ -150,43 +159,58 @@ function handlePrint(block) {
     print('undefined');
 }
 
-function handleDeclaration(block) {
-    const name = block.querySelector('input[type="text"]').value.trim();
-    const value = Number(block.querySelector('input[type="number"]').value);
-    variables[name] = value;
-}
-
 function handleAssignment(block) {
-    const name = block.querySelector('input[type="text"]').value.trim();
-    const exprBlock = block.querySelector('.block-body .variable-val');
-
-    if (!exprBlock) return;
-
-    const expr = exprBlock.querySelector('input').value;
+    const nameInput = block.querySelector('input[type="text"]');
+    const exprInput = block.querySelector('input[placeholder="arithmetic expression"]');
+    
+    if (!nameInput || !exprInput) return;
+    
+    const name = nameInput.value.trim();
+    const expr = exprInput.value.trim();
+    
+    if (name === '') return;
+    
+    if (expr === '') {
+        variables[name] = 0;
+        print(`Переменная ${name} = 0`);
+        return;
+    }
+    
     const result = evaluateExpression(expr);
     variables[name] = result;
+    print(`Переменная ${name} = ${result}`);
 }
 
 function handleIf(block) {
-    const condition = block.querySelector('.block-header input').value;
+    const conditionInput = block.querySelector('.block-header input');
+    if (!conditionInput) return;
+    
+    const condition = conditionInput.value;
     const result = evaluateExpression(condition);
+    const body = block.querySelector('.block-body');
 
-    if (result) {
-        executeBlocks(block.querySelector('.block-body'));
+    if (result && body) {
+        executeBlocks(body);
     }
 }
+
 function handleIfElse(block) {
-    const condition = block.querySelector('.block-header input').value;
+    const conditionInput = block.querySelector('.block-header input');
+    if (!conditionInput) return;
+    
+    const condition = conditionInput.value;
     const result = evaluateExpression(condition);
     
     const bodies = block.querySelectorAll('.block-body');
-    const IfBody = bodies[0];
-    const ElseBody = bodies[1];
+    if (bodies.length < 2) return;
+    
+    const ifBody = bodies[0];
+    const elseBody = bodies[1];
     
     if (result) {
-        executeBlocks(IfBody);
+        executeBlocks(ifBody);
     } else {
-        executeBlocks(ElseBody);
+        executeBlocks(elseBody);
     }
 }
 
@@ -194,21 +218,106 @@ function handleWhile(block) {
     const conditionInput = block.querySelector('.block-header input');
     const body = block.querySelector('.block-body');
 
-    if(!conditionInput || !body) return;
+    if (!conditionInput || !body) return;
 
     let safetyCount = 0;
-    const MaxItterations = 10000;
-
+    const MaxIterations = 10000;
     let condition = conditionInput.value;
 
-    while (evaluateExpression(condition)){
+    while (evaluateExpression(condition)) {
         executeBlocks(body);
         condition = conditionInput.value;
         safetyCount++;
-        if(safetyCount > MaxItterations){
+        if (safetyCount > MaxIterations) {
+            print("Ошибка: превышено максимальное количество итераций цикла");
             break;
         }
     }
+}
+
+function handleFunctionDefinition(block) {
+    const nameInput = block.querySelector('.block-header input[placeholder="name function"]');
+    const argsInput = block.querySelectorAll('.block-header input')[1];
+    const body = block.querySelector('.block-body');
+    
+    if (!nameInput || !body) return;
+    
+    const name = nameInput.value.trim();
+    if (name === '') return;
+    
+    let params = [];
+    if (argsInput && argsInput.value.trim() !== '') {
+        params = argsInput.value.split(',')
+            .map(p => p.trim())
+            .filter(p => p !== '');
+    }
+    
+    functions[name] = {
+        params: params,
+        body: body,
+        block: block
+    };
+    
+}
+
+function handleFunctionCall(block) {
+    const inputs = block.querySelectorAll('input');
+    const nameInput = inputs[0];
+    const argsInput = inputs[1];
+    
+    if (!nameInput) return null;
+    
+    const name = nameInput.value.trim();
+    if (name === '') return null;
+    
+    if (!functions[name]) {
+        print(`Ошибка: функция "${name}" не определена`);
+        return null;
+    }
+    
+    const func = functions[name];
+    
+    let args = [];
+    if (argsInput && argsInput.value.trim() !== '') {
+        args = argsInput.value.split(',')
+            .map(a => a.trim())
+            .filter(a => a !== '');
+    }
+    
+    if (args.length !== func.params.length) {
+        print(`Ошибка: функция "${name}" ожидает ${func.params.length} параметров, получено ${args.length}`);
+        return null;
+    }
+    
+    const argValues = args.map(arg => evaluateExpression(arg));
+    
+    const globalVars = {...variables};
+    
+    for (let i = 0; i < func.params.length; i++) {
+        variables[func.params[i]] = argValues[i];
+    }
+        
+    const returnValue = executeBlocks(func.body);
+    
+    variables = globalVars;
+    
+    if (returnValue !== null && returnValue !== undefined) {
+        print(`Переменная "${name}" = ${returnValue}`);
+        return returnValue;
+    } else {
+        return null;
+    }
+}
+
+function handleReturn(block) {
+    const input = block.querySelector('input');
+    if (!input) return null;
+    
+    const expr = input.value.trim();
+    if (expr === '') return null;
+    
+    const result = evaluateExpression(expr);
+    return result;
 }
 
 function evaluateExpression(expr) {
@@ -232,7 +341,6 @@ function toRPN(tokens) {
     const stack = [];
 
     for (const token of tokens) {
-
         if (isNumber(token) || isVariable(token)) {
             output.push(token);
             continue;
@@ -273,11 +381,9 @@ function evalRPN(rpn) {
     const stack = [];
 
     for (const token of rpn) {
-
         if (!isNaN(token)) {
             stack.push(Number(token));
-        }
-        else if (isVariable(token)) {
+        } else if (isVariable(token)) {
             stack.push(variables[token] ?? 0);
         } else {
             const b = stack.pop();
@@ -307,9 +413,9 @@ function applyOperator(op, a, b) {
         case '!=': return a != b;
         case '>=': return a >= b;
         case '<=': return a <= b;
+        default: return 0;
     }
 }
-
 
 function isNumber(x) {
     return !isNaN(x);
