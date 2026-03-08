@@ -37,6 +37,8 @@ workspace.addEventListener('drop', event =>{
         if(type === 'assignment') newBlock.classList.add('variable-dec2');
         if (type === 'assignment-val') newBlock.classList.add('variable-val');
         if(type === 'if') newBlock.classList.add('if-block');
+        if(type === 'if-else') newBlock.classList.add('if-else-block');
+        if(type === 'while') newBlock.classList.add('while-block');
         
         newBlock.dataset.type = type;
         newBlock.innerHTML = html;
@@ -84,11 +86,18 @@ workspace.addEventListener('drop', event =>{
     event.preventDefault();
     if (!draggedBlock) return;
     
-    const dropTarget = event.target.closest('.block-template');
-    if (dropTarget && dropTarget !=draggedBlock){
-        workspace.insertBefore(draggedBlock, dropTarget);
-    }else{
-        workspace.appendChild(draggedBlock);
+     const innerBody = event.target.closest('.block-body');
+
+    if (innerBody && !innerBody.contains(draggedBlock)) {
+        innerBody.appendChild(draggedBlock);
+    } else {
+        const dropTarget = event.target.closest('.block-template');
+
+        if (dropTarget && dropTarget !== draggedBlock) {
+            workspace.insertBefore(draggedBlock, dropTarget);
+        } else {
+            workspace.appendChild(draggedBlock);
+        }
     }
     draggedBlock = null;
 });
@@ -117,6 +126,8 @@ function executeBlocks(container) {
         if (type === 'declaration') handleDeclaration(block);
         if (type === 'assignment') handleAssignment(block);
         if (type === 'if') handleIf(block);
+        if (type === 'if-else') handleIfElse(block);
+        if (type === 'while') handleWhile(block);
     }
 }
 
@@ -162,6 +173,41 @@ function handleIf(block) {
 
     if (result) {
         executeBlocks(block.querySelector('.block-body'));
+    }
+}
+function handleIfElse(block) {
+    const condition = block.querySelector('.block-header input').value;
+    const result = evaluateExpression(condition);
+    
+    const bodies = block.querySelectorAll('.block-body');
+    const IfBody = bodies[0];
+    const ElseBody = bodies[1];
+    
+    if (result) {
+        executeBlocks(IfBody);
+    } else {
+        executeBlocks(ElseBody);
+    }
+}
+
+function handleWhile(block) {
+    const conditionInput = block.querySelector('.block-header input');
+    const body = block.querySelector('.block-body');
+
+    if(!conditionInput || !body) return;
+
+    let safetyCount = 0;
+    const MaxItterations = 10000;
+
+    let condition = conditionInput.value;
+
+    while (evaluateExpression(condition)){
+        executeBlocks(body);
+        condition = conditionInput.value;
+        safetyCount++;
+        if(safetyCount > MaxItterations){
+            break;
+        }
     }
 }
 

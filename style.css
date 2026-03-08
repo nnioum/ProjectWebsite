@@ -1,5 +1,4 @@
 
-/*ну тут общие настройки*/
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
@@ -11,7 +10,6 @@ body {
     overflow: hidden; 
 }
 
-/*Текст вверху*/
 .top-bar {
     height: 10px;
     background-color: #2d2d2d;
@@ -118,7 +116,7 @@ body {
     display: block;   
 }
 
-.variable-decl { 
+.variable-dec1 {
     background-color: #e67e22; 
     min-width: 200px;
     max-width: 400px;  
@@ -152,12 +150,6 @@ body {
     display: block; 
 }
 
-.if-block .block-body{
-    width: 80%; 
-    display: flex;            
-    flex-direction: column
-}
-
 .block-header {
     padding: 8px;
     display: flex;
@@ -165,6 +157,9 @@ body {
     gap: 5px;
 }
 .block-body {
+    width: 80%; 
+    display: flex;            
+    flex-direction: column;
     background-color: rgba(0,0,0,0.2);
     min-height: 30px;
     margin: 0 5px 5px 15px;
@@ -174,7 +169,7 @@ body {
 }
 
 .mini-input {
-    width: 40px;
+    width: 35%;
     border: none;
     border-radius: 2px;
     padding: 2px 4px;
@@ -201,16 +196,43 @@ body {
     position: relative;
     overflow: auto;
 }
+
 .print-block { background-color: #16a085; 
 }
+
 .start-message {
     color: #555;
     text-align: center;
     margin-top: 100px;
     font-size: 1.2rem;
 }
+.if-else-block {    
+    border-radius: 4px;             
+    margin: 10px 0;                  
+    background: #9b59b6;                
+    display: flex;                    
+    flex-direction: column;  
+    align-items: flex-start; 
+    padding: 0px;  
+    user-select: none;        
+}
 
-/* 3. КОНСОЛЬ */
+.else-selection{
+    width: 100%;
+}
+
+.while-block{
+    border-radius: 4px;             
+    margin: 10px 0;                  
+    background: #87c7c4;                
+    display: flex;                    
+    flex-direction: column;  
+    align-items: flex-start; 
+    padding: 0px;  
+    user-select: none; 
+}
+
+
 .console-panel {
     width: 250px;
     background-color: #1a1a1a;
