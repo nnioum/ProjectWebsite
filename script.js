@@ -71,8 +71,10 @@ workspace.addEventListener('drop', event =>{
         }
 
         if (type === "if-else"){
-            const body = newBlock.querySelector('.block-body');
-            body.innerHTML = '';
+            const bodies = newBlock.querySelectorAll('.block-body');
+            bodies.forEach(body => {
+                body.innerHTML = '';
+            });
         }
 
         if (type === "while"){
