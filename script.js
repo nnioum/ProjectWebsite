@@ -44,10 +44,6 @@ workspace.addEventListener('drop', event =>{
         newBlock.innerHTML = html;
         newBlock.setAttribute('draggable', 'true');
 
-        newBlock.addEventListener('dblclick', event =>{
-            newBlock.remove();
-        });
-
         const dropTarget = event.target.closest('.block-body') || workspace;
 
         if(event.target.closest('.block-header')){
@@ -56,12 +52,30 @@ workspace.addEventListener('drop', event =>{
             dropTarget.appendChild(newBlock);
         }
         
+        const closeBtn = newBlock.querySelector('.block-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(event) {
+                event.stopPropagation();
+                this.closest('.block-template').remove();
+            });
+        }
+
         if (type === 'if'){
             const body = newBlock.querySelector('.block-body');
             body.innerHTML = '';
         }
 
         if (type === "assignment"){
+            const body = newBlock.querySelector('.block-body');
+            body.innerHTML = '';
+        }
+
+        if (type === "if-else"){
+            const body = newBlock.querySelector('.block-body');
+            body.innerHTML = '';
+        }
+
+        if (type === "while"){
             const body = newBlock.querySelector('.block-body');
             body.innerHTML = '';
         }
