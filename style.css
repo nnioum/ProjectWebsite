@@ -110,12 +110,17 @@ body {
     opacity: 0.9;
 }
 
-.variable-dec1 {
-    background-color: #e67e22; 
-}
 
 .variable-dec2 { 
     background-color: #e7b43c; 
+}
+
+.variable-dec2 .long-input{
+    width: 80px;
+    border: none;
+    border-radius: 2px;
+    padding: 2px 4px;
+    font-family: monospace;
 }
 
 .variable-val {

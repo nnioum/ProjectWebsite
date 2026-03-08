@@ -33,7 +33,6 @@ workspace.addEventListener('drop', event =>{
         newBlock.classList.add('block-template');
 
         if(type === 'print') newBlock.classList.add('print-block');
-        if(type === 'declaration') newBlock.classList.add('variable-dec1');
         if(type === 'assignment') newBlock.classList.add('variable-dec2');
         if (type === 'assignment-val') newBlock.classList.add('variable-val');
         if(type === 'if') newBlock.classList.add('if-block');
@@ -174,12 +173,17 @@ function handleDeclaration(block) {
 
 function handleAssignment(block) {
     const name = block.querySelector('input[type="text"]').value.trim();
-    const exprBlock = block.querySelector('.block-body .variable-val');
-
-    if (!exprBlock) return;
-
-    const expr = exprBlock.querySelector('input').value;
-    const result = evaluateExpression(expr);
+    const exprInput = block.querySelector('input[placeholder="arithmetic expression"]');
+    
+    if (!exprInput) return;
+    
+    const expr = exprInput.value.trim();
+    
+    if (expr === '') {
+        variables[name] = 0;
+        return;
+    }
+        const result = evaluateExpression(expr);
     variables[name] = result;
 }
 
