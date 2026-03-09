@@ -195,6 +195,19 @@ body {
     border-radius: 2px;
     border: none;
 }
+.if-else-block .else-selection {
+    display: none;
+}
+
+.if-else-block.show-else .else-selection {
+    display: block;
+}
+
+.toggle-else {
+    margin-left: 10px;
+    cursor: pointer;
+    background-color: #e6c8f5;
+}
 
 .workspace {
     flex: 1;

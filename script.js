@@ -110,6 +110,23 @@ clearBtn.addEventListener('click', () => {
     functions = {};
 });
 
+document.addEventListener("click", function(e) {
+
+    if (e.target.classList.contains("toggle-else")) {
+
+        const block = e.target.closest(".if-else-block");
+        block.classList.toggle("show-else");
+
+        if (block.classList.contains("show-else")) {
+            e.target.textContent = "- ELSE";
+        } else {
+            e.target.textContent = "+ ELSE";
+        }
+
+    }
+
+});
+
 function executeBlocks(container) {
     const blocks = [...container.children].filter(b =>
         b.classList.contains('block-template')
@@ -180,7 +197,7 @@ function handleAssignment(block) {
     variables[name] = result;
     print(`Переменная ${name} = ${result}`);
 }
-
+/*
 function handleIf(block) {
     const conditionInput = block.querySelector('.block-header input');
     if (!conditionInput) return;
@@ -192,7 +209,7 @@ function handleIf(block) {
     if (result && body) {
         executeBlocks(body);
     }
-}
+}*/
 
 function handleIfElse(block) {
     const conditionInput = block.querySelector('.block-header input');
@@ -209,7 +226,7 @@ function handleIfElse(block) {
     
     if (result) {
         executeBlocks(ifBody);
-    } else {
+    } else if (block.classList.contains("show-else")){
         executeBlocks(elseBody);
     }
 }
