@@ -114,6 +114,25 @@ body {
     background-color: #e7b43c; 
 }
 
+.array-dec { 
+    background-color: #e96f37; 
+}
+
+.array-dec .block-header{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.array-values{
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+.array-values input{
+    width: 80%;
+}
+
 .variable-dec .long-input{
     width: 80px;
     border: none;
@@ -133,6 +152,10 @@ body {
 
 .while-block {
     background-color: #87c7c4;
+}
+
+.for-block{
+    background-color: #4c8c6a;
 }
 
 .function-block{

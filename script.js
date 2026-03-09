@@ -35,6 +35,7 @@ workspace.addEventListener('drop', event => {
 
         if (type === 'print') newBlock.classList.add('print-block');
         if (type === 'assignment') newBlock.classList.add('variable-dec');
+        if (type === 'array') newBlock.classList.add('array-dec');
         if (type === 'if') newBlock.classList.add('if-block');
         if (type === 'if-else') newBlock.classList.add('if-else-block');
         if (type === 'while') newBlock.classList.add('while-block');
@@ -120,6 +121,7 @@ function executeBlocks(container) {
 
         if (type === 'print') handlePrint(block);
         if (type === 'assignment') handleAssignment(block);
+        if (type === 'array') handleArray(block);
         if (type === 'if') handleIf(block);
         if (type === 'if-else') handleIfElse(block);
         if (type === 'while') handleWhile(block);
@@ -146,16 +148,16 @@ function handlePrint(block) {
         print(input.slice(1, -1));
         return;
     }
-
-    if (!isNaN(input)) {
-        print(input);
+    if (!isNaN(input)) { 
+        print(input); 
+        return;
+    } 
+     
+     if (input in variables) {
+        print(`${input} = ${variables[input]}`);
         return;
     }
 
-    if (input in variables) {
-        print(variables[input]);
-        return;
-    }
     print('undefined');
 }
 
@@ -170,15 +172,64 @@ function handleAssignment(block) {
     
     if (name === '') return;
     
-    if (expr === '') {
-        variables[name] = 0;
-        print(`Переменная ${name} = 0`);
-        return;
-    }
+    
     
     const result = evaluateExpression(expr);
-    variables[name] = result;
-    print(`Переменная ${name} = ${result}`);
+    if (/^[A-Za-z_]\w*\[\d+\]$/.test(name)) {
+
+        const arrName = name.split('[')[0];
+        const index = parseInt(name.match(/\[(\d+)\]/)[1]);
+
+        if (!(arrName in variables) || !Array.isArray(variables[arrName])) {
+            print(`Ошибка: массив ${arrName} не существует`);
+            return;
+        }
+
+        if (index < 0 || index >= variables[arrName].length) {
+            print(`Ошибка: индекс вне массива`);
+            return;
+        }
+
+        variables[arrName][index] = result;
+
+       for(let i = 0; i < variables[arrName].length; i++){
+            variables[`${arrName}[${i}]`] = variables[arrName][i];
+        }
+
+        print(`Присваиваем ${arrName}[${index}] = ${result}`);
+
+    } else {
+
+        variables[name] = result;
+
+        print(`Создана Переменная ${name} = ${result}`);
+    }
+}
+
+function handleArray(block){
+    const inputs = block.querySelectorAll('input');
+    const name = inputs[0].value.trim();
+    const size =parseInt(inputs[1].value.trim());
+    const values = inputs[2].value.trim();
+
+
+    if(name === '' || isNaN(size)) return;
+
+    let arr = new Array(size).fill(0);
+    
+    if(values !== ''){
+        const nums = values.split(',').map(v => evaluateExpression(v.trim()));
+
+        for(let i = 0; i < nums.length && i < size; i++){
+            arr[i] =  nums[i];
+        }
+    }
+
+    variables[name] = arr;
+    for(let i = 0; i < arr.length; i++){
+        variables[`${name}[${i}]`] = arr[i];
+    }
+    print(`Создан Массив ${name} = [${arr}]`);
 }
 
 function handleIf(block) {
@@ -326,11 +377,37 @@ function evaluateExpression(expr) {
     return evalRPN(rpn);
 }
 
+function getArrayValue(token){
+
+    const match = token.match(/^([A-Za-z_]\w*)\[(.+)\]$/);
+
+    if(!match) return null;
+
+    const arrName = match[1];
+    const indexExpr = match[2];
+
+    if(!(arrName in variables)) return 0;
+
+    const index = evaluateExpression(indexExpr);
+
+    const arr = variables[arrName];
+
+    if(!Array.isArray(arr)) return 0;
+
+    return arr[index] ?? 0;
+}
+
+
+
 function tokenize(expr) {
-    return expr.match(/[A-Za-z_]\w*|\d+|==|!=|<=|>=|[()+\-*/<>]/g) || [];
+    const regex = /\d+|[A-Za-z_]\w*\[[^\]]+\]|[A-Za-z_]\w*|[+\-*/()<>!=]/g;
+    return expr.match(regex) || [];
 }
 
 const precedence = {
+    'OR': 0,
+    'AND': 0,
+    'NOT': 4,
     '==': 1, '!=': 1, '<': 1, '>': 1, '<=': 1, '>=': 1,
     '+': 2, '-': 2,
     '*': 3, '/': 3
@@ -381,11 +458,24 @@ function evalRPN(rpn) {
     const stack = [];
 
     for (const token of rpn) {
+        
         if (!isNaN(token)) {
             stack.push(Number(token));
-        } else if (isVariable(token)) {
+        }
+        
+        else if(token.includes('[')){
+
+            const val = getArrayValue(token);
+
+            stack.push(val ?? 0);
+
+        }
+        
+        else if (isVariable(token)) {
             stack.push(variables[token] ?? 0);
-        } else {
+        }
+        
+        else {
             const b = stack.pop();
             const a = stack.pop();
             stack.push(applyOperator(token, a, b));
@@ -413,6 +503,8 @@ function applyOperator(op, a, b) {
         case '!=': return a != b;
         case '>=': return a >= b;
         case '<=': return a <= b;
+        case 'AND': return a && b;
+        case 'OR': return a || b;
         default: return 0;
     }
 }
