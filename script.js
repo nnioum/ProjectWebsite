@@ -34,9 +34,14 @@ workspace.addEventListener('drop', event => {
         newBlock.classList.add('block-template');
 
         if (type === 'print') newBlock.classList.add('print-block');
-        if (type === 'assignment') newBlock.classList.add('variable-dec');
+        if (type === 'assignment') {
+            newBlock.classList.add('variable-dec');
+            if (html.includes('true / false')) { 
+                newBlock.classList.add('bool-block');
+            }
+        }
         if (type === 'if') newBlock.classList.add('if-block');
-        if (type === 'if-else') newBlock.classList.add('if-else-block');
+        if (type === 'if-else') newBlock.classList.add('if-else-block'); 
         if (type === 'while') newBlock.classList.add('while-block');
         if (type === 'functions') newBlock.classList.add('function-block');
         if (type === 'call') newBlock.classList.add('call-block');
@@ -177,8 +182,9 @@ function handlePrint(block) {
 }
 
 function handleAssignment(block) {
-    const nameInput = block.querySelector('input[type="text"]');
-    const exprInput = block.querySelector('input[placeholder="arithmetic expression"]');
+    const inputs = block.querySelectorAll('input');
+    const nameInput = inputs[0];
+    const exprInput = inputs[1];
     
     if (!nameInput || !exprInput) return;
     
@@ -398,7 +404,12 @@ function evalRPN(rpn) {
     const stack = [];
 
     for (const token of rpn) {
-        if (!isNaN(token)) {
+
+        if (token === 'true') {
+            stack.push(true);
+        } else if (token === 'false') {
+            stack.push(false);
+        } else if (!isNaN(token)) {
             stack.push(Number(token));
         } else if (isVariable(token)) {
             stack.push(variables[token] ?? 0);
