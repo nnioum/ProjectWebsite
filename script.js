@@ -39,6 +39,7 @@ workspace.addEventListener('drop', event => {
         if (type === 'if') newBlock.classList.add('if-block');
         if (type === 'if-else') newBlock.classList.add('if-else-block');
         if (type === 'while') newBlock.classList.add('while-block');
+        if (type === 'for') newBlock.classList.add('for-block');
         if (type === 'functions') newBlock.classList.add('function-block');
         if (type === 'call') newBlock.classList.add('call-block');
         if (type === 'return') newBlock.classList.add('return-block');
@@ -125,6 +126,7 @@ function executeBlocks(container) {
         if (type === 'if') handleIf(block);
         if (type === 'if-else') handleIfElse(block);
         if (type === 'while') handleWhile(block);
+        if (type === 'for') handleFor(block);
         if (type === 'functions') handleFunctionDefinition(block);
         if (type === 'call') {
             const result = handleFunctionCall(block);
@@ -153,12 +155,12 @@ function handlePrint(block) {
         return;
     } 
      
-     if (input in variables) {
-        print(`${input} = ${variables[input]}`);
-        return;
+    const result = evaluateExpression(input);
+    if (result != null && result !== undefined && !isNaN(result) || Array.isArray(result)){
+        print(`${input} = ${result}`);
+    }else{
+        print(`undefined`)
     }
-
-    print('undefined');
 }
 
 function handleAssignment(block) {
@@ -175,34 +177,20 @@ function handleAssignment(block) {
     
     
     const result = evaluateExpression(expr);
-    if (/^[A-Za-z_]\w*\[\d+\]$/.test(name)) {
+    if (/^[A-Za-z_]\w*\[.+\]$/.test(name)) {
 
         const arrName = name.split('[')[0];
-        const index = parseInt(name.match(/\[(\d+)\]/)[1]);
+        const indexExpr = name.match(/\[(.+)\]/)[1];
+        const index = evaluateExpression(indexExpr);
 
-        if (!(arrName in variables) || !Array.isArray(variables[arrName])) {
-            print(`Ошибка: массив ${arrName} не существует`);
-            return;
+        if (variables[arrName] && Array.isArray(variables[arrName])) {
+            variables[arrName][index] = result;
         }
-
-        if (index < 0 || index >= variables[arrName].length) {
-            print(`Ошибка: индекс вне массива`);
-            return;
-        }
-
-        variables[arrName][index] = result;
-
-       for(let i = 0; i < variables[arrName].length; i++){
-            variables[`${arrName}[${i}]`] = variables[arrName][i];
-        }
-
-        print(`Присваиваем ${arrName}[${index}] = ${result}`);
 
     } else {
 
         variables[name] = result;
 
-        print(`Создана Переменная ${name} = ${result}`);
     }
 }
 
@@ -226,10 +214,6 @@ function handleArray(block){
     }
 
     variables[name] = arr;
-    for(let i = 0; i < arr.length; i++){
-        variables[`${name}[${i}]`] = arr[i];
-    }
-    print(`Создан Массив ${name} = [${arr}]`);
 }
 
 function handleIf(block) {
@@ -272,17 +256,55 @@ function handleWhile(block) {
     if (!conditionInput || !body) return;
 
     let safetyCount = 0;
-    const MaxIterations = 10000;
-    let condition = conditionInput.value;
+    const MaxIterations = 5000;
 
-    while (evaluateExpression(condition)) {
+    while (evaluateExpression(conditionInput.value)) {
         executeBlocks(body);
-        condition = conditionInput.value;
         safetyCount++;
         if (safetyCount > MaxIterations) {
             print("Ошибка: превышено максимальное количество итераций цикла");
             break;
         }
+    }
+}
+
+function handleFor(block){
+    const inputs = block.querySelectorAll('.block-header input');
+    const init = inputs[0].value.trim();
+    const condition = inputs[1].value.trim();
+    const update = inputs[2].value.trim();
+    const body = block.querySelector('.block-body');
+
+    if (!body) return;
+
+    if (init !==""){
+        processSimpleAssignment(init);
+    }
+
+    let safetyCount = 0;
+    let MaxIterations = 5000;
+
+    while (evaluateExpression(condition)){
+        executeBlocks(body);
+
+        if (update !== ""){
+            processSimpleAssignment(update);
+        }
+
+        safetyCount++;
+        if(safetyCount > MaxIterations){
+            print("Ошибка: превышено максимальное количество итераций цикла FOR");
+            break;
+        }
+    }
+}
+
+function processSimpleAssignment(expr){
+    const parts = expr.split('=');
+    if (parts.length === 2) {
+        const name = parts[0].trim();
+        const value = parts[1].trim();
+        variables[name] = evaluateExpression(value);
     }
 }
 
@@ -388,19 +410,23 @@ function getArrayValue(token){
 
     if(!(arrName in variables)) return 0;
 
-    const index = evaluateExpression(indexExpr);
-
     const arr = variables[arrName];
-
+    
     if(!Array.isArray(arr)) return 0;
 
-    return arr[index] ?? 0;
+    const index = evaluateExpression(indexExpr);
+
+    if (index < 0 || index >= arr.length) {
+        print(`Ошибка: индекс ${index} вне границ массива ${arrName}`);
+        return 0;
+    }
+    return arr[index];
 }
 
 
 
 function tokenize(expr) {
-    const regex = /\d+|[A-Za-z_]\w*\[[^\]]+\]|[A-Za-z_]\w*|[+\-*/()<>!=]/g;
+    const regex = /\d+|[A-Za-z_]\w*\[[^\]]+\]|[A-Za-z_]\w*|==|!=|>=|<=|[+\-*/()<>!=]/g;
     return expr.match(regex) || [];
 }
 
