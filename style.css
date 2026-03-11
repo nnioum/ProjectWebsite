@@ -126,7 +126,7 @@ body {
     background-color: #d2ca2f;
 }
 
-.if-block,
+
 .if-else-block { 
     background-color: #9b59b6;
 }
@@ -206,7 +206,7 @@ body {
 .toggle-else {
     margin-left: 10px;
     cursor: pointer;
-    background-color: #e6c8f5;
+    background-color: #e3bdf3;
 }
 
 .workspace {

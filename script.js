@@ -35,7 +35,6 @@ workspace.addEventListener('drop', event => {
 
         if (type === 'print') newBlock.classList.add('print-block');
         if (type === 'assignment') newBlock.classList.add('variable-dec');
-        if (type === 'if') newBlock.classList.add('if-block');
         if (type === 'if-else') newBlock.classList.add('if-else-block');
         if (type === 'while') newBlock.classList.add('while-block');
         if (type === 'functions') newBlock.classList.add('function-block');
@@ -57,7 +56,7 @@ workspace.addEventListener('drop', event => {
             });
         }
 
-        if (type === 'if' || type === 'if-else' || type === 'while' || type === 'functions') {
+        if (type === 'if-else' || type === 'while' || type === 'functions') {
             const bodies = newBlock.querySelectorAll('.block-body');
             bodies.forEach(body => {
                 body.innerHTML = '';
@@ -137,7 +136,6 @@ function executeBlocks(container) {
 
         if (type === 'print') handlePrint(block);
         if (type === 'assignment') handleAssignment(block);
-        if (type === 'if') handleIf(block);
         if (type === 'if-else') handleIfElse(block);
         if (type === 'while') handleWhile(block);
         if (type === 'functions') handleFunctionDefinition(block);
@@ -197,19 +195,7 @@ function handleAssignment(block) {
     variables[name] = result;
     print(`Переменная ${name} = ${result}`);
 }
-/*
-function handleIf(block) {
-    const conditionInput = block.querySelector('.block-header input');
-    if (!conditionInput) return;
-    
-    const condition = conditionInput.value;
-    const result = evaluateExpression(condition);
-    const body = block.querySelector('.block-body');
 
-    if (result && body) {
-        executeBlocks(body);
-    }
-}*/
 
 function handleIfElse(block) {
     const conditionInput = block.querySelector('.block-header input');
