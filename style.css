@@ -122,6 +122,10 @@ body {
     font-family: monospace;
 }
 
+.float-block {
+    background-color: #40855e;
+}
+
 .variable-val {
     background-color: #d2ca2f;
 }

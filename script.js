@@ -40,6 +40,7 @@ workspace.addEventListener('drop', event => {
         if (type === 'functions') newBlock.classList.add('function-block');
         if (type === 'call') newBlock.classList.add('call-block');
         if (type === 'return') newBlock.classList.add('return-block');
+        if (type === 'float') newBlock.classList.add('float-block');
 
         newBlock.dataset.type = type;
         newBlock.innerHTML = html;
@@ -139,6 +140,7 @@ function executeBlocks(container) {
         if (type === 'if-else') handleIfElse(block);
         if (type === 'while') handleWhile(block);
         if (type === 'functions') handleFunctionDefinition(block);
+        if (type === 'float') handleFloat(block);
         if (type === 'call') {
             const result = handleFunctionCall(block);
             if (result !== null && result !== undefined) {
@@ -196,6 +198,28 @@ function handleAssignment(block) {
     print(`Переменная ${name} = ${result}`);
 }
 
+function handleFloat(block){
+    const nameInput = block.querySelector('input[type="text"]');
+    const exprInput = block.querySelector('input[placeholder="arithmetic expression"]');
+
+    if (!nameInput || !exprInput) return;
+
+    const name = nameInput.value.trim();
+    const expr = exprInput.value.trim();
+
+    if (name === '') return;
+    
+    if (expr === '') {
+        variables[name] = 0;
+        print(`Переменная ${name} = 0`);
+        return;
+    }
+
+    const value = parseFloat(evaluateExpression(expr));
+    variables[name] = value;
+
+    print(`Переменная ${name} = ${value}`);
+}
 
 function handleIfElse(block) {
     const conditionInput = block.querySelector('.block-header input');
@@ -330,7 +354,7 @@ function evaluateExpression(expr) {
 }
 
 function tokenize(expr) {
-    return expr.match(/[A-Za-z_]\w*|\d+|==|!=|<=|>=|[()+\-*/<>]/g) || [];
+    return expr.match(/[A-Za-z_]\w*|\d+(\.\d+)?|==|!=|<=|>=|[()+\-*/<>]/g) || [];
 }
 
 const precedence = {
