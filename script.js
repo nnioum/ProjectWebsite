@@ -35,7 +35,6 @@ workspace.addEventListener('drop', event => {
 
         if (type === 'print') newBlock.classList.add('print-block');
         if (type === 'assignment') newBlock.classList.add('variable-dec');
-        if (type === 'if') newBlock.classList.add('if-block');
         if (type === 'if-else') newBlock.classList.add('if-else-block');
         if (type === 'while') newBlock.classList.add('while-block');
         if (type === 'functions') newBlock.classList.add('function-block');
@@ -57,7 +56,7 @@ workspace.addEventListener('drop', event => {
             });
         }
 
-        if (type === 'if' || type === 'if-else' || type === 'while' || type === 'functions') {
+        if (type === 'if-else' || type === 'while' || type === 'functions') {
             const bodies = newBlock.querySelectorAll('.block-body');
             bodies.forEach(body => {
                 body.innerHTML = '';
@@ -110,6 +109,23 @@ clearBtn.addEventListener('click', () => {
     functions = {};
 });
 
+document.addEventListener("click", function(e) {
+
+    if (e.target.classList.contains("toggle-else")) {
+
+        const block = e.target.closest(".if-else-block");
+        block.classList.toggle("show-else");
+
+        if (block.classList.contains("show-else")) {
+            e.target.textContent = "- ELSE";
+        } else {
+            e.target.textContent = "+ ELSE";
+        }
+
+    }
+
+});
+
 function executeBlocks(container) {
     const blocks = [...container.children].filter(b =>
         b.classList.contains('block-template')
@@ -120,7 +136,6 @@ function executeBlocks(container) {
 
         if (type === 'print') handlePrint(block);
         if (type === 'assignment') handleAssignment(block);
-        if (type === 'if') handleIf(block);
         if (type === 'if-else') handleIfElse(block);
         if (type === 'while') handleWhile(block);
         if (type === 'functions') handleFunctionDefinition(block);
@@ -181,18 +196,6 @@ function handleAssignment(block) {
     print(`Переменная ${name} = ${result}`);
 }
 
-function handleIf(block) {
-    const conditionInput = block.querySelector('.block-header input');
-    if (!conditionInput) return;
-    
-    const condition = conditionInput.value;
-    const result = evaluateExpression(condition);
-    const body = block.querySelector('.block-body');
-
-    if (result && body) {
-        executeBlocks(body);
-    }
-}
 
 function handleIfElse(block) {
     const conditionInput = block.querySelector('.block-header input');
@@ -209,7 +212,7 @@ function handleIfElse(block) {
     
     if (result) {
         executeBlocks(ifBody);
-    } else {
+    } else if (block.classList.contains("show-else")){
         executeBlocks(elseBody);
     }
 }
