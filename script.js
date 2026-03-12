@@ -330,13 +330,13 @@ function evaluateExpression(expr) {
 }
 
 function tokenize(expr) {
-    return expr.match(/[A-Za-z_]\w*|\d+|==|!=|<=|>=|[()+\-*/<>]/g) || [];
+    return expr.match(/[A-Za-z_]\w*|\d+|==|!=|<=|>=|[()+\-*/<>%]/g) || [];
 }
 
 const precedence = {
     '==': 1, '!=': 1, '<': 1, '>': 1, '<=': 1, '>=': 1,
     '+': 2, '-': 2,
-    '*': 3, '/': 3
+    '*': 3, '/': 3, '%': 3
 };
 
 function toRPN(tokens) {
@@ -409,13 +409,14 @@ function applyOperator(op, a, b) {
         case '+': return a + b;
         case '-': return a - b;
         case '*': return a * b;
-        case '/': return a / b;
+        case '/': return Math.floor(a / b);
         case '>': return a > b;
         case '<': return a < b;
-        case '==': return a == b;
-        case '!=': return a != b;
+        case '==': return a === b;
+        case '!=': return a !== b;
         case '>=': return a >= b;
         case '<=': return a <= b;
+        case '%': return a % b;
         default: return 0;
     }
 }
