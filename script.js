@@ -59,7 +59,7 @@ workspace.addEventListener('drop', event => {
             });
         }
 
-        if (type === 'if' || type === 'if-else' || type === 'while' || type === 'functions') {
+        if (type === 'if' || type === 'if-else' || type === 'while' || type === 'functions' || type === 'for') {
             const bodies = newBlock.querySelectorAll('.block-body');
             bodies.forEach(body => {
                 body.innerHTML = '';
