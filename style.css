@@ -145,7 +145,7 @@ body {
     background-color: #d2ca2f;
 }
 
-.if-block,
+
 .if-else-block { 
     background-color: #9b59b6;
 }
@@ -217,6 +217,19 @@ body {
 .mini-select {
     border-radius: 2px;
     border: none;
+}
+.if-else-block .else-selection {
+    display: none;
+}
+
+.if-else-block.show-else .else-selection {
+    display: block;
+}
+
+.toggle-else {
+    margin-left: 10px;
+    cursor: pointer;
+    background-color: #e3bdf3;
 }
 
 .workspace {
