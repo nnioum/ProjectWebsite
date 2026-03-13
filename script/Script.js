@@ -351,7 +351,7 @@ function handleFunctionDefinition(block) {
     }
     
     functions[name] = {
-        params: params,
+}        params: params,
         body: body,
         block: block
     };
