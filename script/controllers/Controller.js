@@ -11,6 +11,7 @@ function printController(input) {
     } 
      
     const result = evaluateExpression(input);
+    printService(result);
 }
 
 function assignmentController(nameInput, exprInput) {
@@ -25,6 +26,23 @@ function assignmentController(nameInput, exprInput) {
     
     
     const result = evaluateExpression(expr);
+    if (/^[A-Za-z_]\w*\[.+\]$/.test(name)) {
+
+        const arrName = name.split('[')[0];
+        const indexExpr = name.match(/\[(.+)\]/)[1];
+        const index = evaluateExpression(indexExpr);
+
+        if (getAssignmentService(arrName) && Array.isArray(getAssignmentService(arrName))) {
+            const newName =getAssignment(arrName);
+            newName[index] = result;
+            editAssignmentService(arrName,newName);
+        }
+
+    } else {
+
+       editAssignmentService(arrName, result);
+
+    }
 }
 
 function arrayController(inputs){
@@ -44,7 +62,7 @@ function arrayController(inputs){
             arr[i] =  nums[i];
         }
     }
-    //
+    arrayService(name,arr);
 }
 
 
@@ -74,7 +92,7 @@ function whileController(conditionInput, body) {
     const MaxIterations = 5000;
 
     while (evaluateExpression(conditionInput.value)) {
-        executeBlocks(body);//
+        executeBlocks(body);
         safetyCount++;
         if (safetyCount > MaxIterations) {
             throw new ValidationError("превышено максимальное количество итераций цикла While");
@@ -115,12 +133,14 @@ function processSimpleAssignmentCntrl(parts){
     if (parts.length === 2) {
         const name = parts[0].trim();
         const value = parts[1].trim();
-        //call service
+        
+        const evaluate = evaluateExpression(value);
 
+        simpleAssigment(name, evaluate);
     }
 }
 
-function functionDefinitionController(name, arg, body) {
+function functionDefinitionController(name, arg, body, block) {
     
     if (!name || !body) return;
     
@@ -133,6 +153,8 @@ function functionDefinitionController(name, arg, body) {
             .map(p => p.trim())
             .filter(p => p !== '');
     }
+
+    functionDefinitionService(name, params, body, block);
     
 }
 
@@ -153,6 +175,7 @@ function functionCallController(inputs) {
     }
     
     const argValues = args.map(arg => evaluateExpression(arg));
+    callService(name, args, argValues);
 }
 
 function returnController(input) {

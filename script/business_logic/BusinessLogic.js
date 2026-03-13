@@ -1,13 +1,31 @@
-function handlePrint(block) {
+function getPrint(block) {
     
     printController(block.querySelector('input').value.trim());
-    
+
 }
 
-function handleAssignment(block) {
+function getAssignment(block) {
     const nameInput = block.querySelector('input[type="text"]');
     const exprInput = block.querySelector('input[placeholder="arithmetic expression"]');
     
+    const name = nameInput.value.trim();
+    const expr = exprInput.value.trim();
+
+    if (/^[A-Za-z_]\w*\[.+\]$/.test(name)) {
+
+        const arrName = name.split('[')[0];
+        const indexExpr = name.match(/\[(.+)\]/)[1];
+        const index = evaluateExpression(indexExpr);
+
+        if (variables[arrName] && Array.isArray(variables[arrName])) {
+            variables[arrName][index] = result;
+        }
+
+    } else {
+
+        variables[name] = result;
+
+    }
     assignmentController(nameInput, exprInput);
 }
 
