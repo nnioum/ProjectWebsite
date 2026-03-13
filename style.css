@@ -302,3 +302,11 @@ body {
     background: rgba(255, 68, 68, 0.8);
     transform: scale(1.1);
 }
+
+.bool-block {
+    background-color: #92b300 !important;
+}
+
+.string-block {
+    background-color: #27ae60 !important;
+}

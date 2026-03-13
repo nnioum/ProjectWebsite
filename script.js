@@ -35,6 +35,8 @@ workspace.addEventListener('drop', event => {
 
         if (type === 'print') newBlock.classList.add('print-block');
         if (type === 'assignment') newBlock.classList.add('variable-dec');
+        if (type === 'assignment-bool') newBlock.classList.add('variable-dec', 'bool-block');
+        if (type === 'assignment-string') newBlock.classList.add('variable-dec', 'string-block');
         if (type === 'array') newBlock.classList.add('array-dec');
         if (type === 'if-else') newBlock.classList.add('if-else-block');
         if (type === 'while') newBlock.classList.add('while-block');
@@ -137,8 +139,8 @@ function executeBlocks(container) {
         const type = block.dataset.type;
 
         if (type === 'print') handlePrint(block);
-        if (type === 'assignment') handleAssignment(block);
-       if (type === 'array') handleArray(block);
+        if (type === 'assignment' || type === 'assignment-bool' || type === 'assignment-string') handleAssignment(block);
+        if (type === 'array') handleArray(block);
         if (type === 'if-else') handleIfElse(block);
         if (type === 'while') handleWhile(block);
         if (type === 'for') handleFor(block);
@@ -160,52 +162,51 @@ function executeBlocks(container) {
 }
 
 function handlePrint(block) {
-    const input = block.querySelector('input').value.trim();
-    if (input.startsWith('"') && input.endsWith('"')) {
-        print(input.slice(1, -1));
+    const inputField = block.querySelector('input');
+    if (!inputField) return;
+
+    const val = inputField.value.trim();
+    if (val === '') return;
+    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        print(val.slice(1, -1));
         return;
     }
-    if (!isNaN(input)) { 
-        print(input); 
+    if (!isNaN(val) && val !== '') {
+        print(val);
         return;
-    } 
-     
-    const result = evaluateExpression(input);
-    if (result != null && result !== undefined && !isNaN(result) || Array.isArray(result)){
-        print(`${input} = ${result}`);
-    }else{
-        print(`undefined`)
+    }
+    const result = evaluateExpression(val);
+    if (result !== null && result !== undefined) {
+        print(`${val} = ${result}`);
+    } else {
+        print(`undefined`);
     }
 }
-
+function isVariable(token) {
+    return /^[a-zA-Z_]\w*$/.test(token) && token !== 'true' && token !== 'false';
+}
 function handleAssignment(block) {
-    const nameInput = block.querySelector('input[type="text"]');
-    const exprInput = block.querySelector('input[placeholder="arithmetic expression"]');
+    const inputs = block.querySelectorAll('input');
+    if (inputs.length < 2) return;
     
-    if (!nameInput || !exprInput) return;
-    
-    const name = nameInput.value.trim();
-    const expr = exprInput.value.trim();
+    const name = inputs[0].value.trim();
+    const expr = inputs[1].value.trim();
     
     if (name === '') return;
     
-    
-    
     const result = evaluateExpression(expr);
-    if (/^[A-Za-z_]\w*\[.+\]$/.test(name)) {
-
-        const arrName = name.split('[')[0];
-        const indexExpr = name.match(/\[(.+)\]/)[1];
-        const index = evaluateExpression(indexExpr);
-
-        if (variables[arrName] && Array.isArray(variables[arrName])) {
-            variables[arrName][index] = result;
+    
+    if (name.includes('[')) {
+        const match = name.match(/^([A-Za-z_]\w*)\[(.+)\]$/);
+        if (match) {
+            const arrName = match[1];
+            const index = evaluateExpression(match[2]);
+            if (variables[arrName] && Array.isArray(variables[arrName])) {
+                variables[arrName][index] = result;
+            }
         }
-
     } else {
-
         variables[name] = result;
-
     }
 }
 
@@ -231,27 +232,6 @@ function handleArray(block){
     variables[name] = arr;
 }
 
-function handleArray(block){
-    const inputs = block.querySelectorAll('input');
-    const name = inputs[0].value.trim();
-    const size =parseInt(inputs[1].value.trim());
-    const values = inputs[2].value.trim();
-
-
-    if(name === '' || isNaN(size)) return;
-
-    let arr = new Array(size).fill(0);
-    
-    if(values !== ''){
-        const nums = values.split(',').map(v => evaluateExpression(v.trim()));
-
-        for(let i = 0; i < nums.length && i < size; i++){
-            arr[i] =  nums[i];
-        }
-    }
-
-    variables[name] = arr;
-}
 
 
 function handleIfElse(block) {
@@ -449,8 +429,8 @@ function getArrayValue(token){
 }
 
 function tokenize(expr) {
-    const regex = /\d+|[A-Za-z_]\w*\[[^\]]+\]|[A-Za-z_]\w*|==|!=|>=|<=|[+\-*/()<>!=]/g;
-    return expr.match(regex) || [];
+    const regex = /("[^"]*"|'[^']*')|\s*(==|!=|>=|<=|>|<|[+\-*/()\[\]])\s*|\s+/;
+    return expr.split(regex).filter(Boolean);
 }
 
 const precedence = {
@@ -467,10 +447,12 @@ function toRPN(tokens) {
     const stack = [];
 
     for (const token of tokens) {
-        if (isNumber(token) || isVariable(token)) {
-            output.push(token);
-            continue;
-        }
+        if (isNumber(token) || isVariable(token) || 
+        token === 'true' || token === 'false' || 
+        token.startsWith("'") || token.startsWith('"')) {
+        output.push(token);
+        continue;
+}
 
         if (token === '(') {
             stack.push(token);
@@ -508,23 +490,20 @@ function evalRPN(rpn) {
 
     for (const token of rpn) {
         
-        if (!isNaN(token)) {
+        if (token === 'true') {
+            stack.push(true);
+        } else if (token === 'false') {
+            stack.push(false);
+        } else if ((token.startsWith('"') && token.endsWith('"')) || (token.startsWith("'") && token.endsWith("'"))) {
+            stack.push(token.slice(1, -1));
+        } else if (!isNaN(token)) {
             stack.push(Number(token));
-        }
-        
-        else if(token.includes('[')){
-
+        } else if(token.includes('[')) {
             const val = getArrayValue(token);
-
             stack.push(val ?? 0);
-
-        }
-        
-        else if (isVariable(token)) {
-            stack.push(variables[token] ?? 0);
-        }
-        
-        else {
+        } else if (isVariable(token)) {
+            stack.push(variables[token] !== undefined ? variables[token] : 0);
+        } else {
             const b = stack.pop();
             const a = stack.pop();
             stack.push(applyOperator(token, a, b));
@@ -561,8 +540,4 @@ function applyOperator(op, a, b) {
 
 function isNumber(x) {
     return !isNaN(x);
-}
-
-function isVariable(x) {
-    return /^[A-Za-z_]\w*$/.test(x);
 }
