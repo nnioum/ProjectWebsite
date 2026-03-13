@@ -1,5 +1,5 @@
 function getAssignmentService(name){
-    Variables.getByName(name);
+    return Variables.getByName(name);
 }
 
 function editAssignmentService(name, value){

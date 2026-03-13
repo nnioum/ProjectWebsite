@@ -1,4 +1,4 @@
-function executeBlocks(container) {
+export function executeBlocks(container) {
     const blocks = [...container.children].filter(b =>
         b.classList.contains('block-template')
     );

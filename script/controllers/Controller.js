@@ -11,7 +11,7 @@ function printController(input) {
     } 
      
     const result = evaluateExpression(input);
-    printService(result);
+    
 }
 
 function assignmentController(nameInput, exprInput) {
@@ -23,8 +23,6 @@ function assignmentController(nameInput, exprInput) {
     
     if (name === '') return;
     
-    
-    
     const result = evaluateExpression(expr);
     if (/^[A-Za-z_]\w*\[.+\]$/.test(name)) {
 
@@ -33,15 +31,13 @@ function assignmentController(nameInput, exprInput) {
         const index = evaluateExpression(indexExpr);
 
         if (getAssignmentService(arrName) && Array.isArray(getAssignmentService(arrName))) {
-            const newName =getAssignment(arrName);
+            const newName = getAssignmentService(arrName);
             newName[index] = result;
-            editAssignmentService(arrName,newName);
+            editAssignmentService(arrName, newName);
         }
 
     } else {
-
-       editAssignmentService(arrName, result);
-
+        editAssignmentService(name, result);
     }
 }
 
@@ -62,7 +58,7 @@ function arrayController(inputs){
             arr[i] =  nums[i];
         }
     }
-    arrayService(name,arr);
+    arrayService(name, arr);
 }
 
 
@@ -92,7 +88,7 @@ function whileController(conditionInput, body) {
     const MaxIterations = 5000;
 
     while (evaluateExpression(conditionInput.value)) {
-        executeBlocks(body);
+        executeBlocks(body);//
         safetyCount++;
         if (safetyCount > MaxIterations) {
             throw new ValidationError("превышено максимальное количество итераций цикла While");
@@ -133,15 +129,14 @@ function processSimpleAssignmentCntrl(parts){
     if (parts.length === 2) {
         const name = parts[0].trim();
         const value = parts[1].trim();
-        
-        const evaluate = evaluateExpression(value);
 
-        simpleAssigment(name, evaluate);
+        const evalute = evaluateExpression(value);
+        simpleAssignment(name, evalute);
+
     }
 }
 
 function functionDefinitionController(name, arg, body, block) {
-    
     if (!name || !body) return;
     
     const name = nameInput.value.trim();
@@ -153,8 +148,7 @@ function functionDefinitionController(name, arg, body, block) {
             .map(p => p.trim())
             .filter(p => p !== '');
     }
-
-    functionDefinitionService(name, params, body, block);
+    functionDefinitionSrvice(name, params, body, block);
     
 }
 
@@ -198,8 +192,8 @@ function arrayValueController(match){
     const index = evaluateExpression(indexExpr);
 
     if(!(arrName in variables)) return 0;
+    return 
 }
-
 
 
 

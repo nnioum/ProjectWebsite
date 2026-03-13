@@ -1,4 +1,3 @@
-function simpleAssigment(name, evaluate){
-    Variables.edit(name, evaluate);
+function simpleAssignment(name, evalute){
+    Variables.edit(name, evalute);
 }
-
