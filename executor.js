@@ -3,7 +3,7 @@ import { RuntimeError } from './error/RuntimeError.js';
 import { ValidationError } from './error/ValidationError.js';
 
 export function initExecutor(workspace, runBtn, clearBtn) {
-    let variables = {};
+    let variables = new Map();
     let functions = {};
 
     runBtn.addEventListener('click', () => {
