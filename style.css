@@ -8,6 +8,54 @@ body {
     color: #d4d4d4;
     overflow: hidden; 
 }
+@media (max-width: 800px) {
+    .sidebar {
+        width: 200px;
+    }
+    
+    .console-panel {
+        width: 200px;
+    }
+    
+    .long-input {
+        width: 80px;
+    }
+}
+
+
+@media (max-width: 450px) {
+    .main-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: 200px;
+        overflow-x: auto;
+        display: flex;
+        flex-wrap: nowrap;
+    }
+    
+    .sidebar .category {
+        min-width: 250px;
+        margin-right: 15px;
+    }
+    
+    .console-panel {
+        width: 100%;
+        height: 150px;
+    }
+    
+    .top-bar .actions {
+        display: flex;
+        gap: 5px;
+    }
+    
+    .btn {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+    }
+}
 
 .top-bar {
     height: 10px;
