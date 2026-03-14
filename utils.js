@@ -49,22 +49,25 @@ export function toRPN(tokens) {
 
 export function getArrayValue(token, vars = variables) {
     const match = token.match(/^([A-Za-z_]\w*)\[(.+)\]$/);
-    if (!match) return 0;
+    try{
+        if (!match) throw new ValidationError(`Неверный синтаксис массива: ${token}`);
 
-    const arrName = match[1];
-    const indexExpr = match[2];
+        const arrName = match[1];
+        const indexExpr = match[2];
 
-    if (!(arrName in vars)) return 0;
-    const arr = vars[arrName];
-    if (!Array.isArray(arr)) return 0;
+        if (!(arrName in vars)) throw new ValidationError(`Массив ${arrName} не найден`);
+        const arr = vars[arrName];
+        if (!Array.isArray(arr)) throw new ValidationError(`Переменная ${arrName} не является массивом`);;
 
-    const index = evaluateExpression(indexExpr, vars);
-    if (index < 0 || index >= arr.length) {
-        print(`Ошибка: индекс ${index} вне границ массива ${arrName}`);
-        return 0;
+        const index = evaluateExpression(indexExpr, vars);
+        if (index < 0 || index >= arr.length) {
+            throw new ValidationError(`индекс ${index} вне границ массива ${arrName}`);
+        }
+
+        return arr[index];
+    }catch(e){
+        print(`Ошибка: ${e.messege}`);
     }
-
-    return arr[index];
 }
 
 
@@ -72,17 +75,31 @@ export function evalRPN(rpn, vars = variables) {
     const stack = [];
 
     for (const token of rpn) {
+        try{
         if (isNumber(token)) {
             stack.push(Number(token));
         } else if (token.includes('[')) {
-            stack.push(getArrayValue(token, vars) ?? 0);
+            const value = getArrayValue(token, vars);
+            if (value === undefined || value === null) {
+                throw new RuntimeError(`Массив не найден: ${token}`);
+            }
+            stack.push(value);
         } else if (isVariable(token)) {
+            if (!(token in vars)) {
+                throw new RuntimeError(`Переменная не определена: ${token}`);
+            }
             stack.push(vars[token] ?? 0);
         } else {
+             if (stack.length < 2) {
+                throw new RuntimeError(`Недостаточно операндов для оператора: ${token}`);
+            }
             const b = stack.pop();
             const a = stack.pop();
             stack.push(applyOperator(token, a, b));
         }
+    }catch(e){
+        print(`Ошибка: ${e.messege}`)
+    }
     }
 
     return stack[0];

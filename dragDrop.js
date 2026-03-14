@@ -2,7 +2,6 @@ export function initDragDrop(workspace) {
     let draggedBlock = null;
     let sourceIsSidebar = false;
 
-    // Drag из sidebar
     document.querySelectorAll('.sidebar .block-template').forEach(block => {
         block.addEventListener('dragstart', e => {
             draggedBlock = block.cloneNode(true);
@@ -10,7 +9,6 @@ export function initDragDrop(workspace) {
         });
     });
 
-    // Drag внутри workspace
     workspace.addEventListener('dragstart', e => {
         if (e.target.classList.contains('block-template')) {
             draggedBlock = e.target;

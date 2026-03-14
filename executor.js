@@ -33,6 +33,8 @@ export function initExecutor(workspace, runBtn, clearBtn) {
 
             if (type === 'print') handlePrint(block);
             else if (type === 'assignment') handleAssignment(block);
+            else if (type === 'assignment-bool') handleBoolAssignment(block);
+            else if (type === 'assignment-string') handleStringAssignment(block);
             else if (type === 'array') handleArray(block);
             else if (type === 'if-else') handleIfElse(block);
             else if (type === 'while') handleWhile(block);
@@ -50,6 +52,28 @@ export function initExecutor(workspace, runBtn, clearBtn) {
         return null;
     }
 
+
+    function handleBoolAssignment(block) {
+        const inputs = block.querySelectorAll('input');
+        const name = inputs[0].value.trim();
+        const val = inputs[1].value.trim().toLowerCase();
+        if (!name) return;
+        
+            variables[name] = (val === 'true' || val === '1');
+        }
+
+    function handleStringAssignment(block) {
+        const inputs = block.querySelectorAll('input');
+        const name = inputs[0].value.trim();
+        let val = inputs[1].value.trim();
+        if (!name) return;
+
+        if ((val.startsWith("'") && val.endsWith("'")) || (val.startsWith('"') && val.endsWith('"'))) {
+                val = val.slice(1, -1);
+        }
+        variables[name] = val;
+    }
+
     function handlePrint(block) {
         const input = block.querySelector('input').value.trim();
         if (!input) return;
@@ -57,7 +81,6 @@ export function initExecutor(workspace, runBtn, clearBtn) {
             print(input.slice(1, -1)); 
             return; 
         }
-         if (!isNaN(input)) { print(input); return; }
         const val = evaluateExpression(input, variables, getArrayValue.bind(null, variables));
         print(`${input} = ${val}`);
     }
@@ -110,11 +133,15 @@ export function initExecutor(workspace, runBtn, clearBtn) {
         const condInput = block.querySelector('.block-header input').value;
         const body = block.querySelector('.block-body');
         let safety = 0, max = 5000;
+        try {
         while (evaluateExpression(condInput, variables, getArrayValue.bind(null, variables))) {
             executeBlocks(body);
             if (++safety > max) { 
                 throw new RuntimeError("цикл WHILE слишком большой");
             }
+        }
+        } catch (e) {
+            print(`Ошибка: ${e.message}`);
         }
     }
 
@@ -125,10 +152,14 @@ export function initExecutor(workspace, runBtn, clearBtn) {
         if (inputs[0].value) processAssignment(inputs[0].value);
 
         let safety = 0, max = 5000;
-        while (evaluateExpression(inputs[1].value, variables, getArrayValue.bind(null, variables))) {
-            executeBlocks(body);
-            if (inputs[2].value) processAssignment(inputs[2].value);
-            if (++safety > max) { throw new RuntimeError("цикл FOR слишком большой");}
+        try {
+            while (evaluateExpression(inputs[1].value, variables, getArrayValue.bind(null, variables))) {
+                executeBlocks(body);
+                if (inputs[2].value) processAssignment(inputs[2].value);
+                if (++safety > max) { throw new RuntimeError("цикл FOR слишком большой");}
+            }
+        } catch (e) {
+            print(`Ошибка: ${e.message}`);
         }
     }
 
@@ -154,11 +185,14 @@ export function initExecutor(workspace, runBtn, clearBtn) {
         const inputs = block.querySelectorAll('input');
         const name = inputs[0].value.trim();
         const args = inputs[1]?.value.split(',').map(a=>a.trim()).filter(a=>a) || [];
-        if (!functions[name]) { throw new RuntimeError(`функция ${name} не найдена`); return null; }
-        const func = functions[name];
+        try{
+            if (!functions[name]) { throw new RuntimeError(`функция ${name} не найдена`); return null; }
+            const func = functions[name];
 
-        if (args.length !== func.params.length) { throw new RuntimeError(`функция ${name} ожидает ${func.params.length} параметров`); return null; }
-
+            if (args.length !== func.params.length) { throw new RuntimeError(`функция ${name} ожидает ${func.params.length} параметров`); return null; }
+        } catch (e) {
+            print(`Ошибка: ${e.message}`);
+        }
         const globalVars = {...variables};
         func.params.forEach((p,i)=>variables[p] = evaluateExpression(args[i], variables, getArrayValue.bind(null, variables)));
 
@@ -173,12 +207,4 @@ export function initExecutor(workspace, runBtn, clearBtn) {
         if (!val) return null;
         return evaluateExpression(val, variables, getArrayValue.bind(null, variables));
     }
-
-    // try {
-    //     executeBlocks(workspace);
-    // } catch (e) {
-    //     if (e instanceof ValidationError || e instanceof RuntimeError) {
-    //         print(`Ошибка: ${e.message}`);
-    //     }
-    // }
-}
+} 
