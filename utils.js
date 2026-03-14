@@ -11,6 +11,15 @@ export function print(text) {
     consoleOutput.appendChild(line);
 }
 
+export function printError(error) {
+    const consoleOutput = document.getElementById('console-output');
+    const line = document.createElement('div');
+    line.textContent = `Ошибка: ${error.message}`;
+    line.style.color = '#ff4444';
+    line.style.fontWeight = 'bold';
+    consoleOutput.appendChild(line);
+}
+
 export function tokenize(expr) {
     const regex = /\d+|[A-Za-z_]\w*\[[^\]]+\]|[A-Za-z_]\w*|==|!=|>=|<=|[+\-*/()<>!=]/g;
     return expr.match(regex) || [];
@@ -68,7 +77,7 @@ export function getArrayValue(token, vars = variables) {
 
         return arr[index];
     }catch(e){
-        print(`Ошибка: ${e.message}`);
+        printError(e);
     }
 }
 
@@ -88,7 +97,7 @@ export function evalRPN(rpn, vars = variables) {
             stack.push(value);
         } else if (isVariable(token)) {
             if (!(token in vars)) {
-                throw new RuntimeError(`Переменная не определена\n ${token}`);
+                throw new RuntimeError(`Неправильные данные \n ${token}`);
             }
             stack.push(vars[token] ?? 0);
         } else {
@@ -100,7 +109,7 @@ export function evalRPN(rpn, vars = variables) {
             stack.push(applyOperator(token, a, b));
         }
     }catch(e){
-        print(`Ошибка: ${e.message}`)
+        printError(e)
     }
     }
 

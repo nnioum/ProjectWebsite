@@ -1,4 +1,4 @@
-import { evaluateExpression, getArrayValue, print } from './utils.js';
+import { evaluateExpression, getArrayValue, print, printError } from './utils.js';
 import { RuntimeError } from './error/RuntimeError.js';
 import { ValidationError } from './error/ValidationError.js';
 
@@ -143,7 +143,7 @@ export function initExecutor(workspace, runBtn, clearBtn) {
             }
         }
         } catch (e) {
-            print(`Ошибка: ${e.message}`);
+            printError(e);
         }
     }
 
@@ -161,7 +161,7 @@ export function initExecutor(workspace, runBtn, clearBtn) {
                 if (++safety > max) { throw new ValidationError("цикл FOR слишком большой");}
             }
         } catch (e) {
-            print(`Ошибка: ${e.message}`);
+            printError(e);
         }
     }
 
@@ -193,7 +193,7 @@ export function initExecutor(workspace, runBtn, clearBtn) {
 
             if (args.length !== func.params.length) { throw new RuntimeError(`функция ${name} ожидает ${func.params.length} параметров`); return null; }
         } catch (e) {
-            print(`Ошибка: ${e.message}`);
+            printError(e);
         }
         const globalVars = {...variables};
         func.params.forEach((p,i)=>variables[p] = evaluateExpression(args[i], variables, getArrayValue.bind(null, variables)));
