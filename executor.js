@@ -1,7 +1,9 @@
 import { evaluateExpression, getArrayValue, print } from './utils.js';
+import { RuntimeError } from './error/RuntimeError.js';
+import { ValidationError } from './error/ValidationError.js';
 
 export function initExecutor(workspace, runBtn, clearBtn) {
-    let variables = {};
+    let variables = new Map();
     let functions = {};
 
     runBtn.addEventListener('click', () => {
@@ -137,7 +139,7 @@ export function initExecutor(workspace, runBtn, clearBtn) {
         while (evaluateExpression(condInput, variables, getArrayValue.bind(null, variables))) {
             executeBlocks(body);
             if (++safety > max) { 
-                throw new RuntimeError("цикл WHILE слишком большой");
+                throw new ValidationError("цикл WHILE слишком большой");
             }
         }
         } catch (e) {
@@ -156,7 +158,7 @@ export function initExecutor(workspace, runBtn, clearBtn) {
             while (evaluateExpression(inputs[1].value, variables, getArrayValue.bind(null, variables))) {
                 executeBlocks(body);
                 if (inputs[2].value) processAssignment(inputs[2].value);
-                if (++safety > max) { throw new RuntimeError("цикл FOR слишком большой");}
+                if (++safety > max) { throw new ValidationError("цикл FOR слишком большой");}
             }
         } catch (e) {
             print(`Ошибка: ${e.message}`);
