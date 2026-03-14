@@ -109,7 +109,7 @@ export function evalRPN(rpn, vars = variables) {
             stack.push(applyOperator(token, a, b));
         }
     }catch(e){
-        printError(e)
+        throw e;
     }
     }
 

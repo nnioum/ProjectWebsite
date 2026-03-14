@@ -2,14 +2,43 @@ import { evaluateExpression, getArrayValue, print, printError } from './utils.js
 import { RuntimeError } from './error/RuntimeError.js';
 import { ValidationError } from './error/ValidationError.js';
 
-export function initExecutor(workspace, runBtn, clearBtn) {
-    let variables = new Map();
+export function initExecutor(workspace, runBtn, clearBtn, stopBtn) {
+    let variables = {};
     let functions = {};
+    let isRunning = false;
 
     runBtn.addEventListener('click', () => {
+        if (isRunning) {
+            print("Программа уже выполняется");
+            return;
+        }
+        
         document.getElementById('console-output').innerHTML = '';
         variables = {};
-        executeBlocks(workspace);
+        functions = {}; 
+        isRunning = true;
+        
+        stopBtn.disabled = false;
+        
+        executeBlocks(workspace)
+            .catch(e => {
+                if (e.message === "Выполнение остановлено пользователем") {
+                    print("Программа остановлена");
+                } else {
+                    printError(e);
+                }
+            })
+            .finally(() => {
+                isRunning = false;
+                stopBtn.disabled = true;
+            });
+    });
+
+    stopBtn.addEventListener('click', () => {
+        if (!stopBtn.disabled) { 
+            isRunning = false;
+            print("Останавливаем программу...");
+        }
     });
 
     clearBtn.addEventListener('click', () => {
@@ -17,6 +46,8 @@ export function initExecutor(workspace, runBtn, clearBtn) {
         document.getElementById('console-output').innerHTML = '';
         variables = {};
         functions = {};
+        isRunning = false;
+        stopBtn.disabled = true;
     });
 
     document.addEventListener("click", e => {
@@ -27,10 +58,19 @@ export function initExecutor(workspace, runBtn, clearBtn) {
         }
     });
 
-    function executeBlocks(container) {
-        const blocks = [...container.children].filter(b => b.classList.contains('block-template'));
+    async function checkStop() {
+        if (isRunning === false) {
+            throw new ValidationError("Выполнение остановлено пользователем");
+        }
+        await new Promise(resolve => setTimeout(resolve, 0));
+    }
 
+    async function executeBlocks(container) {
+    const blocks = [...container.children].filter(b => b.classList.contains('block-template'));
+    try {            
         for (const block of blocks) {
+            await checkStop(); 
+            await new Promise(resolve => setTimeout(resolve, 250));
             const type = block.dataset.type;
 
             if (type === 'print') handlePrint(block);
@@ -38,12 +78,12 @@ export function initExecutor(workspace, runBtn, clearBtn) {
             else if (type === 'assignment-bool') handleBoolAssignment(block);
             else if (type === 'assignment-string') handleStringAssignment(block);
             else if (type === 'array') handleArray(block);
-            else if (type === 'if-else') handleIfElse(block);
-            else if (type === 'while') handleWhile(block);
-            else if (type === 'for') handleFor(block);
+            else if (type === 'if-else') await handleIfElse(block);
+            else if (type === 'while') await handleWhile(block); 
+            else if (type === 'for') await handleFor(block);
             else if (type === 'functions') handleFunctionDefinition(block);
             else if (type === 'call') {
-                const result = handleFunctionCall(block);
+                const result = await handleFunctionCall(block);
                 if (result !== null) return result;
             }
             else if (type === 'return') {
@@ -52,19 +92,30 @@ export function initExecutor(workspace, runBtn, clearBtn) {
             }
         }
         return null;
+    } catch (e) {
+        if (e.message === "Выполнение остановлено пользователем") {
+            print("Программа остановлена");
+        } else {
+            printError(e);
+        }
+        return null;
     }
+}
+
 
 
     function handleBoolAssignment(block) {
+        checkStop(); 
         const inputs = block.querySelectorAll('input');
         const name = inputs[0].value.trim();
         const val = inputs[1].value.trim().toLowerCase();
         if (!name) return;
         
             variables[name] = (val === 'true' || val === '1');
-        }
+    }
 
     function handleStringAssignment(block) {
+        checkStop(); 
         const inputs = block.querySelectorAll('input');
         const name = inputs[0].value.trim();
         let val = inputs[1].value.trim();
@@ -77,6 +128,7 @@ export function initExecutor(workspace, runBtn, clearBtn) {
     }
 
     function handlePrint(block) {
+        checkStop(); 
         const input = block.querySelector('input').value.trim();
         if (!input) return;
         if (input.startsWith('"') && input.endsWith('"')) { 
@@ -88,6 +140,7 @@ export function initExecutor(workspace, runBtn, clearBtn) {
     }
 
     function handleAssignment(block) {
+        checkStop(); 
         const inputs = block.querySelectorAll('input');
         const name = inputs[0].value.trim();
         const expr = inputs[1].value.trim();
@@ -108,6 +161,7 @@ export function initExecutor(workspace, runBtn, clearBtn) {
     }
 
     function handleArray(block) {
+        checkStop();
         const inputs = block.querySelectorAll('input');
         const name = inputs[0].value.trim();
         const size = parseInt(inputs[1].value.trim());
@@ -122,50 +176,58 @@ export function initExecutor(workspace, runBtn, clearBtn) {
         variables[name] = arr;
     }
 
-    function handleIfElse(block) {
+    async function handleIfElse(block) {
+        checkStop();
         const cond = block.querySelector('.block-header input').value;
         const bodies = block.querySelectorAll('.block-body');
         const result = evaluateExpression(cond, variables, getArrayValue.bind(null, variables));
 
-        if (result) executeBlocks(bodies[0]);
-        else if (block.classList.contains("show-else")) executeBlocks(bodies[1]);
+        if (result) {
+            await executeBlocks(bodies[0]);
+        } else if (block.classList.contains("show-else")) {
+            await executeBlocks(bodies[1]);
+        }
     }
 
-    function handleWhile(block) {
+    async function handleWhile(block) {
         const condInput = block.querySelector('.block-header input').value;
         const body = block.querySelector('.block-body');
         let safety = 0, max = 5000;
-        try {
+        
         while (evaluateExpression(condInput, variables, getArrayValue.bind(null, variables))) {
-            executeBlocks(body);
+            await checkStop(); 
+        
+            await executeBlocks(body);
+            
             if (++safety > max) { 
                 throw new ValidationError("цикл WHILE слишком большой");
             }
         }
-        } catch (e) {
-            printError(e);
-        }
     }
 
-    function handleFor(block) {
+    async function handleFor(block) {
         const inputs = block.querySelectorAll('.block-header input');
         const body = block.querySelector('.block-body');
 
         if (inputs[0].value) processAssignment(inputs[0].value);
 
         let safety = 0, max = 5000;
-        try {
-            while (evaluateExpression(inputs[1].value, variables, getArrayValue.bind(null, variables))) {
-                executeBlocks(body);
-                if (inputs[2].value) processAssignment(inputs[2].value);
-                if (++safety > max) { throw new ValidationError("цикл FOR слишком большой");}
+        
+        while (evaluateExpression(inputs[1].value, variables, getArrayValue.bind(null, variables))) {
+            await checkStop();
+            
+            await executeBlocks(body);
+            
+            if (inputs[2].value) processAssignment(inputs[2].value);
+            
+            if (++safety > max) { 
+                throw new ValidationError("цикл FOR слишком большой");
             }
-        } catch (e) {
-            printError(e);
         }
     }
 
     function processAssignment(expr) {
+        checkStop(); 
         const parts = expr.split('=');
         if (parts.length === 2) {
             const name = parts[0].trim();
@@ -175,6 +237,7 @@ export function initExecutor(workspace, runBtn, clearBtn) {
     }
 
     function handleFunctionDefinition(block) {
+        checkStop(); 
         const inputs = block.querySelectorAll('.block-header input');
         const name = inputs[0].value.trim();
         const args = inputs[1].value.split(',').map(a=>a.trim()).filter(a=>a);
@@ -183,7 +246,8 @@ export function initExecutor(workspace, runBtn, clearBtn) {
         functions[name] = {params: args, body};
     }
 
-    function handleFunctionCall(block) {
+    async function handleFunctionCall(block) {
+        checkStop(); 
         const inputs = block.querySelectorAll('input');
         const name = inputs[0].value.trim();
         const args = inputs[1]?.value.split(',').map(a=>a.trim()).filter(a=>a) || [];
@@ -198,13 +262,14 @@ export function initExecutor(workspace, runBtn, clearBtn) {
         const globalVars = {...variables};
         func.params.forEach((p,i)=>variables[p] = evaluateExpression(args[i], variables, getArrayValue.bind(null, variables)));
 
-        const ret = executeBlocks(func.body);
+        const ret = await executeBlocks(func.body);
         variables = globalVars;
         if (ret !== null) print(`Функция ${name} вернула ${ret}`);
         return ret;
     }
 
     function handleReturn(block) {
+        checkStop(); 
         const val = block.querySelector('input').value;
         if (!val) return null;
         return evaluateExpression(val, variables, getArrayValue.bind(null, variables));
