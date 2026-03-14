@@ -70,6 +70,8 @@ body {
 .main-container {
     display: flex;
     flex: 1;
+    resize: both;  
+    overflow: auto;  
     overflow: hidden;
 }
 
@@ -198,6 +200,30 @@ body {
     margin-top: 10px;
 }
 
+.if-else-block .else-selection {
+    display: none;
+}
+
+.if-else-block.show-else .else-selection {
+    display: block;
+}
+
+.bool-block {
+    background-color: #74b300 !important;
+}
+
+.bool-block .long-input{
+    width: 70px;
+    border: none;
+    border-radius: 2px;
+    padding: 2px 4px;
+    font-family: monospace;
+}
+
+.string-block {
+    background-color: #429665 !important;
+}
+
 .mini-input {
     width: 35%;
     border: none;
@@ -217,13 +243,6 @@ body {
 .mini-select {
     border-radius: 2px;
     border: none;
-}
-.if-else-block .else-selection {
-    display: none;
-}
-
-.if-else-block.show-else .else-selection {
-    display: block;
 }
 
 .toggle-else {
@@ -301,12 +320,4 @@ body {
 .block-close-btn:hover {
     background: rgba(255, 68, 68, 0.8);
     transform: scale(1.1);
-}
-
-.bool-block {
-    background-color: #92b300 !important;
-}
-
-.string-block {
-    background-color: #27ae60 !important;
 }
