@@ -36,7 +36,23 @@
                 <span>=</span>
                 <input type="text" placeholder="arithmetic expression" class = "long-input">
             </div>
-            
+                           
+            <div class="block-template array-dec" draggable="true" data-type="array">
+                <button class="block-close-btn">×</button>
+                <div class="block-header">
+                    <span>Arr</span>
+                    <input type="text" placeholder="name" class="mini-input">
+                    <span>[</span>
+                    <input type ="text" placeholder="size" class="mini-input">
+                    <span>]</span>
+                </div>
+
+                <div class="array-values">
+                    <span>=</span>
+                    <input type="text" placeholder="1,2,3..." class="long-input">
+                </div>
+            </div>
+
             <div class="category-title">Логика</div>
             <div class="block-template if-else-block" draggable="true" data-type="if-else">
                 <div class="block-header">
@@ -70,6 +86,21 @@
             <div class="block-body">
                 <div class="placeholder">Перетащи сюда</div>
             </div>
+            </div>
+            
+            <div class="block-template for-block" draggable="true" data-type="for">
+                <button class="block-close-btn">×</button>
+                <div class="block-header">
+                    <span>FOR</span>
+                    <input type="text" placeholder="init" class="mini-input">
+                    <span>;</span>
+                    <input type="text" placeholder="condition" class="mini-input">
+                    <span>;</span>
+                    <input type="text" placeholder="update" class="mini-input">
+                </div>
+                <div class="block-body">
+                    <div class="placeholder">Перетащи сюда</div>
+                </div>
             </div>
 
             <div class="category-title">Функции</div>
