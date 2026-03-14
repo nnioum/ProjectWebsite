@@ -1,3 +1,5 @@
+import { RuntimeError } from './error/RuntimeError.js';
+import { ValidationError } from './error/ValidationError.js';
 
 export let variables = {}; 
 
@@ -66,7 +68,7 @@ export function getArrayValue(token, vars = variables) {
 
         return arr[index];
     }catch(e){
-        print(`Ошибка: ${e.messege}`);
+        print(`Ошибка: ${e.message}`);
     }
 }
 
@@ -81,24 +83,24 @@ export function evalRPN(rpn, vars = variables) {
         } else if (token.includes('[')) {
             const value = getArrayValue(token, vars);
             if (value === undefined || value === null) {
-                throw new RuntimeError(`Массив не найден: ${token}`);
+                throw new RuntimeError(`Массив не найден \n ${token}`);
             }
             stack.push(value);
         } else if (isVariable(token)) {
             if (!(token in vars)) {
-                throw new RuntimeError(`Переменная не определена: ${token}`);
+                throw new RuntimeError(`Переменная не определена\n ${token}`);
             }
             stack.push(vars[token] ?? 0);
         } else {
              if (stack.length < 2) {
-                throw new RuntimeError(`Недостаточно операндов для оператора: ${token}`);
+                throw new RuntimeError(`Недостаточно операндов для оператора\n ${token}`);
             }
             const b = stack.pop();
             const a = stack.pop();
             stack.push(applyOperator(token, a, b));
         }
     }catch(e){
-        print(`Ошибка: ${e.messege}`)
+        print(`Ошибка: ${e.message}`)
     }
     }
 
