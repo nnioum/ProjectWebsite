@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CodeBlock: Интерпретатор (Уровень Основа)</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="Style.css">
 </head>
 <body>
 
@@ -35,6 +35,22 @@
                 <input type="text" placeholder="name" class="mini-input">
                 <span>=</span>
                 <input type="text" placeholder="arithmetic expression" class = "long-input">
+            </div>
+
+            <div class="block-template variable-dec bool-block" draggable="true" data-type ="assignment-bool">
+                <button class="block-close-btn">×</button>
+                <span>Bool</span>
+                <input type="text" placeholder="name" class="mini-input">
+                <span>=</span>
+                <input type="text" placeholder="true / false" class="long-input">
+            </div>
+
+            <div class="block-template variable-dec string-block" draggable="true" data-type="assignment-string">
+                <button class="block-close-btn">×</button>
+                <span>Str</span>
+                <input type="text" placeholder="name" class="mini-input">
+                <span>=</span>
+                <input type="text" placeholder="'text'" class="long-input">
             </div>
                            
             <div class="block-template array-dec" draggable="true" data-type="array">
@@ -146,6 +162,6 @@
         </aside>
 
     </div>
-    <script src="script.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
